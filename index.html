@@ -308,14 +308,6 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
             <option value="Fitting">Fitting</option>
             <option value="Tube">Tube</option>
           </select>
-          <select id="stock-filter-usedfor" onchange="renderStock()" style="width:155px">
-            <option value="">ทุก Model</option>
-            <option value="FL-60X">FL-60X</option>
-            <option value="FL-61X">FL-61X</option>
-            <option value="FLZ-0220">FLZ-0220</option>
-            <option value="FL-2XX">FL-2XX</option>
-            <option value="FL-2XXX~FL-3XXX">FL-2XXX~FL-3XXX</option>
-          </select>
           <button class="btn btn-ghost btn-sm" onclick="document.getElementById('import-stock-file').click()">📤 Import Excel</button>
           <input type="file" id="import-stock-file" accept=".xlsx,.csv" style="display:none" onchange="importStockFile(event)">
           <button class="btn btn-ghost btn-sm" onclick="exportExcel('stock')">📥 Export Excel</button>
@@ -874,11 +866,6 @@ window.renderStock = function() {
     if (sf && st.key !== sf) return;
     const catf2 = document.getElementById('stock-filter-cat')?.value||'';
     if (catf2 && (s.category||'') !== catf2) return;
-    const usedForFilter = document.getElementById('stock-filter-usedfor')?.value||'';
-    if (usedForFilter) {
-      const uf = Array.isArray(s.usedFor) ? s.usedFor : [];
-      if (!uf.includes(usedForFilter)) return;
-    }
     if (q && !s.model.toLowerCase().includes(q) && !(s.po||'').toLowerCase().includes(q)) return;
     const cost = calcCostThb(s);
     const sell = calcSell(cost);
@@ -1251,7 +1238,7 @@ window.renderHistory = function() {
       <td class="mono ta">฿${fmt(Math.round(h.costThb||0))}</td>
       <td class="mono tg">${isRestock?'—':'฿'+fmt(h.sellThb||0)}</td>
       <td>${po}</td>
-      <td>${isRestock?'': '<button class="btn btn-ghost btn-icon btn-sm" onclick="openEditHist(''+h.id+'')">✏️</button>'}</td>
+      <td>${isRestock?'': `<button class="btn btn-ghost btn-icon btn-sm" onclick="openEditHist('${h.id}')">✏️</button>`}</td>
     </tr>`;
   });
   document.getElementById('hist-tbody').innerHTML = html || '<tr><td colspan="13" class="empty">ยังไม่มีประวัติ</td></tr>';
