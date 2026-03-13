@@ -325,32 +325,38 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 
       <!-- RESTOCK -->
       <div class="page" id="page-restock">
-        <div class="g2 mb12">
-          <div class="card">
-            <div class="card-title">📋 ข้อมูลการเติม</div>
-            <div class="g2">
-              <div class="fg"><label>วันที่เติม *</label><input type="date" id="rs-date"></div>
-              <div class="fg"><label>เลขที่ PO *</label><input type="text" id="rs-po" placeholder="OTL2026-001"></div>
-            </div>
-          </div>
-          <div class="card">
-            <div class="card-title">🔍 เพิ่มสินค้า</div>
-            <div class="search-wrap mb12">
-              <span class="search-icon">🔍</span>
-              <input type="text" id="rs-search" placeholder="ค้นหา Model..." oninput="renderRsResults()">
-            </div>
-            <div id="rs-results" style="max-height:180px;overflow-y:auto"></div>
-            <div class="divider"></div>
-            <button class="btn btn-ghost btn-sm" onclick="addRsCustomItem()">➕ เพิ่มรายการเอง</button>
-          </div>
-        </div>
         <div class="card">
-          <div class="card-title">🛒 รายการที่จะเติม</div>
-          <div id="rs-cart"></div>
-          <div class="divider"></div>
+          <div class="card-title">➕ เติมสินค้าเข้า Stock</div>
+          <div class="g3">
+            <div class="fg"><label>วันที่เติม *</label><input type="date" id="rs-date"></div>
+            <div class="fg"><label>Model สินค้า *</label><input type="text" id="rs-model" list="model-dl" placeholder="พิมพ์หรือเลือก"><datalist id="model-dl"></datalist></div>
+            <div class="fg"><label>เลขที่ PO *</label><input type="text" id="rs-po" placeholder="OTL2025-019"></div>
+          </div>
+          <div class="g3">
+            <div class="fg"><label>สกุลเงิน</label>
+              <select id="rs-cur" onchange="toggleRsCurrency()">
+                <option value="JPY">JPY</option><option value="THB">THB</option>
+              </select>
+            </div>
+            <div class="fg" id="rs-jpy-g"><label>ราคา JPY</label><input type="number" id="rs-jpy" oninput="calcRsCost()"></div>
+            <div class="fg" id="rs-thb-g" style="display:none"><label>ราคา THB</label><input type="number" id="rs-thb" oninput="calcRsCost()"></div>
+            <div class="fg"><label>จำนวนที่เติม *</label><input type="number" id="rs-qty" min="1" oninput="calcRsCost()"></div>
+          </div>
+          <div class="g3">
+            <div class="fg"><label>Min Stock</label><input type="number" id="rs-min" value="1"></div>
+            <div class="fg"><label>ต้นทุน THB/ชิ้น (คำนวณอัตโนมัติ)</label><input type="text" id="rs-cost" readonly></div>
+            <div class="fg"><label>ราคาขาย THB (Margin <span id="rs-mg">45</span>%)</label><input type="text" id="rs-sell" readonly></div>
+          </div>
+          <div class="fg mb16">
+            <label>รูปภาพ (ถ่ายหรือแนบไฟล์)</label>
+            <div class="img-drop" id="rs-drop" onclick="document.getElementById('rs-img').click()">
+              <div id="rs-img-prev">📷<br><span style="font-size:12px;color:var(--text2)">คลิกเพื่อแนบรูป / ถ่ายรูปจากกล้อง</span></div>
+            </div>
+            <input type="file" id="rs-img" accept="image/*" capture="environment" style="display:none" onchange="handleRsImg(event)">
+          </div>
           <div class="flex gap12">
-            <button class="btn btn-ghost btn-sm" onclick="clearRestock()">🔄 ล้าง</button>
-            <button class="btn btn-primary" onclick="saveRestock()">✅ บันทึกการเติมสินค้าทั้งหมด</button>
+            <button class="btn btn-primary" onclick="saveRestock()">✅ บันทึกการเติมสินค้า</button>
+            <button class="btn btn-ghost" onclick="clearRestock()">🔄 ล้าง</button>
           </div>
         </div>
         <div class="card">
@@ -362,17 +368,14 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
         </div>
       </div>
 
-      <!-- hidden datalists -->
-      <datalist id="model-dl"></datalist>
-
       <!-- WITHDRAW -->
       <div class="page" id="page-withdraw">
         <div class="g2 mb12">
           <div class="card">
             <div class="card-title">📋 ข้อมูล Job</div>
             <div class="g2">
-              <div class="fg"><label>เลขที่ Job</label><input type="text" id="wd-job" placeholder="FKD-RP-26-001"></div>
-              <div class="fg"><label>เลขที่ IO / Quotation No.</label><input type="text" id="wd-qt" placeholder="IO/QT-2026-001"></div>
+              <div class="fg"><label>เลขที่ Job</label><input type="text" id="wd-job" placeholder="JOB-2025-001"></div>
+              <div class="fg"><label>เลขที่ Quotation</label><input type="text" id="wd-qt" placeholder="QT-2025-001"></div>
             </div>
             <div class="g2">
               <div class="fg"><label>ผู้เบิก *</label><input type="text" id="wd-name" placeholder="ชื่อ-นามสกุล"></div>
@@ -418,11 +421,6 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
         <div class="flex gap12 mb16">
           <div class="search-wrap" style="flex:1">
             <span class="search-icon">🔍</span>
-            <select id="hist-type-filter" onchange="renderHistory()" style="width:130px">
-              <option value="">ทุกประเภท</option>
-              <option value="withdraw">📤 การเบิก</option>
-              <option value="restock">➕ การเติม</option>
-            </select>
             <input type="text" id="hist-search" placeholder="ค้นหา Job, ลูกค้า, Model..." oninput="renderHistory()">
           </div>
           <select id="hist-filter" onchange="renderHistory()" style="width:170px">
@@ -437,7 +435,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
         <div class="card" style="padding:0">
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>ประเภท</th><th>#</th><th class="th-sort" onclick="sortTable('history','date',this)">วันที่<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','job',this)">Job<span class="sort-icon"></span></th><th>IO/QT</th><th class="th-sort" onclick="sortTable('history','customer',this)">ลูกค้า<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','name',this)">ผู้เบิก/ผู้เติม<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','model',this)">Model<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','qty',this)">จำนวน<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','costThb',this)">ต้นทุน<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','sellThb',this)">ราคาขาย<span class="sort-icon"></span></th><th>PO</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th class="th-sort" onclick="sortTable('history','date',this)">วันที่<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','job',this)">Job<span class="sort-icon"></span></th><th>QT</th><th class="th-sort" onclick="sortTable('history','customer',this)">ลูกค้า<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','name',this)">ผู้เบิก<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','model',this)">Model<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','qty',this)">จำนวน<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','costThb',this)">ต้นทุน<span class="sort-icon"></span></th><th class="th-sort" onclick="sortTable('history','sellThb',this)">ราคาขาย<span class="sort-icon"></span></th><th>PO</th><th></th></tr></thead>
               <tbody id="hist-tbody"></tbody>
             </table>
           </div>
@@ -456,7 +454,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
         <div class="card" style="padding:0">
           <div class="tbl-wrap">
             <table>
-              <thead><tr><th>#</th><th class="th-sort" onclick="sortTable('customers','name',this)">ชื่อบริษัท / ลูกค้า<span class="sort-icon"></span></th><th>แผนก</th><th>ที่อยู่</th><th class="th-sort" onclick="sortTable('customers','contact',this)">ผู้ติดต่อ<span class="sort-icon"></span></th><th>โทร</th><th>อีเมล</th><th></th></tr></thead>
+              <thead><tr><th>#</th><th class="th-sort" onclick="sortTable('customers','name',this)">ชื่อบริษัท / ลูกค้า<span class="sort-icon"></span></th><th>ที่อยู่</th><th class="th-sort" onclick="sortTable('customers','contact',this)">ผู้ติดต่อ<span class="sort-icon"></span></th><th>โทร</th><th>อีเมล</th><th></th></tr></thead>
               <tbody id="cust-tbody"></tbody>
             </table>
           </div>
@@ -555,7 +553,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
     <div class="modal-hdr"><span id="mc-title">เพิ่มลูกค้า</span><button class="btn btn-ghost btn-icon" onclick="closeModal('modal-cust')">✕</button></div>
     <div class="modal-body">
       <div class="fg"><label>ชื่อบริษัท / ลูกค้า *</label><input type="text" id="mc-name"></div>
-      <div class="g2"><div class="fg"><label>แผนก</label><input type="text" id="mc-dept" placeholder="เช่น ฝ่ายจัดซื้อ, วิศวกรรม..."></div><div class="fg"><label>ที่อยู่</label><input type="text" id="mc-addr" placeholder="ที่อยู่"></div></div>
+      <div class="fg"><label>ที่อยู่</label><textarea id="mc-addr" rows="2"></textarea></div>
       <div class="g2"><div class="fg"><label>ผู้ติดต่อ</label><input type="text" id="mc-contact"></div><div class="fg"><label>โทรศัพท์</label><input type="text" id="mc-tel"></div></div>
       <div class="fg"><label>อีเมล</label><input type="email" id="mc-email"></div>
       <input type="hidden" id="mc-id" value="">
@@ -736,7 +734,7 @@ function loadLocal() {
 
 function seedDefaultData() {
   window.localData.stocks = [
-    { id:'s1', model:'VR-55 (1kPa) (FL-3XXX)', po:'OTL2026-001', currency:'JPY', priceJpy:79200, priceThb:0, qty:0, min:2, img:'' },
+    { id:'s1', model:'VR-55 (1kPa) (FL-3XXX)', po:'OTL2025-019', currency:'JPY', priceJpy:79200, priceThb:0, qty:0, min:2, img:'' },
     { id:'s2', model:'VR-55 (1kPa) (FL-296)', po:'OTL2025-047', currency:'JPY', priceJpy:79200, priceThb:0, qty:1, min:1, img:'' },
     { id:'s3', model:'VR-55 (1kPa) LPU-300', po:'OTL2025-047-3', currency:'JPY', priceJpy:79200, priceThb:0, qty:2, min:1, img:'' },
     { id:'s4', model:'VR-55 (2kPa) LPU-300', po:'OTL2025-061', currency:'JPY', priceJpy:81600, priceThb:0, qty:1, min:1, img:'' },
@@ -772,7 +770,6 @@ window.fmtD = n => Number(n||0).toLocaleString('th-TH',{maximumFractionDigits:2}
 
 // ============ UI INIT ============
 function initUI() {
-  window.rsCart = [];
   loadSettingsUI();
   updateModelDL();
   updateCustDL();
@@ -781,7 +778,6 @@ function initUI() {
   renderHistory();
   renderCustomers();
   renderRestockLog();
-  renderRsCart();
   initDates();
   updateBadge();
   setInterval(() => {
@@ -903,8 +899,14 @@ window.getMsCategory = function() {
 window.setMsCategory = function(cat) {
   const presets = ['','Air Valve','Board','Fitting','Tube'];
   const sel = document.getElementById('ms-category');
-  if (presets.includes(cat)) { sel.value = cat; document.getElementById('ms-cat-other-g').style.display = 'none'; }
-  else { sel.value = '__other__'; document.getElementById('ms-cat-other').value = cat||''; document.getElementById('ms-cat-other-g').style.display = cat ? '' : 'none'; }
+  if (presets.includes(cat)) {
+    sel.value = cat;
+    document.getElementById('ms-cat-other-g').style.display = 'none';
+  } else {
+    sel.value = '__other__';
+    document.getElementById('ms-cat-other').value = cat||'';
+    document.getElementById('ms-cat-other-g').style.display = cat ? '' : 'none';
+  }
 }
 window.getMsUsedFor = function() {
   return Array.from(document.querySelectorAll('#ms-usedfor-checks input:checked')).map(c=>c.value);
@@ -922,7 +924,8 @@ window.openStockModal = function() {
   document.getElementById('ms-cur').value = 'JPY';
   document.getElementById('ms-qty').value = '0';
   document.getElementById('ms-min').value = '1';
-  setMsCategory(''); setMsUsedFor([]);
+  setMsCategory('');
+  setMsUsedFor([]);
   document.getElementById('ms-img-prev').innerHTML = '📷 แนบรูป / ถ่ายรูปจากกล้อง';
   window.msImgData = '';
   openModal('modal-stock');
@@ -940,7 +943,8 @@ window.openEditStock = function(id) {
   document.getElementById('ms-qty').value = s.qty||0;
   document.getElementById('ms-min').value = s.min||1;
   document.getElementById('ms-supplier').value = s.supplier||'';
-  setMsCategory(s.category||''); setMsUsedFor(s.usedFor||[]);
+  setMsCategory(s.category||'');
+  setMsUsedFor(s.usedFor||[]);
   window.msImgData = s.img||'';
   if (s.img) document.getElementById('ms-img-prev').innerHTML = `<img src="${s.img}" style="height:60px;border-radius:6px">`;
   else document.getElementById('ms-img-prev').innerHTML = '📷 แนบรูป / ถ่ายรูปจากกล้อง';
@@ -960,10 +964,7 @@ window.calcMsCost = function() {
 window.saveStock = async function() {
   const model = document.getElementById('ms-model').value.trim();
   const po = document.getElementById('ms-po').value.trim();
-  const missingStock = [];
-  if (!model) missingStock.push('Model');
-  if (!po) missingStock.push('PO No.');
-  if (missingStock.length) { toast('❌ กรุณากรอก: ' + missingStock.join(', '), 'var(--red)'); return; }
+  if (!model||!po) { toast('กรอก Model และ PO ด้วย','var(--red)'); return; }
   const data = {
     model, po,
     currency: document.getElementById('ms-cur').value,
@@ -998,155 +999,75 @@ window.handleMsImg = function(e) {
   r.readAsDataURL(f);
 }
 
-// ============ RESTOCK (multi-item cart) ============
-
-window.renderRsResults = function() {
-  const q = (document.getElementById('rs-search')?.value||'').toLowerCase();
-  const res = document.getElementById('rs-results');
-  if (!q) { res.innerHTML=''; return; }
-  const items = [...window.localData.stocks].sort((a,b)=>a.model.localeCompare(b.model,'th')).filter(s=>
-    s.model.toLowerCase().includes(q) || (s.po||'').toLowerCase().includes(q)
-  );
-  if (!items.length) { res.innerHTML='<div class="empty">ไม่พบสินค้า</div>'; return; }
-  res.innerHTML = items.map(s => {
-    const cost = calcCostThb(s), sell = calcSell(cost), st = getStatus(s);
-    return `<div class="cart-row" style="cursor:pointer;margin-bottom:6px" onclick="addRsToCart('${s.id}')">
-      <div class="flex gap8">
-        <span style="flex:1;font-weight:600;font-size:12px">${s.model}</span>
-        <span class="mono ta" style="font-size:11px">ต้นทุน ฿${fmt(Math.round(cost))}</span>
-      </div>
-      <div class="flex gap8 t2" style="font-size:11px;margin-top:3px">
-        <span>${s.po||''}</span><span>คงเหลือ: <b>${s.qty||0}</b></span>
-        <span class="badge ${st.cls}" style="font-size:10px">${st.label}</span>
-      </div>
-    </div>`;
-  }).join('');
+// ============ RESTOCK ============
+window.toggleRsCurrency = function() {
+  const c = document.getElementById('rs-cur').value;
+  document.getElementById('rs-jpy-g').style.display = c==='JPY'?'':'none';
+  document.getElementById('rs-thb-g').style.display = c==='THB'?'':'none';
+  calcRsCost();
 }
 
-window.addRsToCart = function(stockId) {
-  const s = window.localData.stocks.find(x=>x.id===stockId); if(!s) return;
-  window.rsCart.push({ stockId, model:s.model, cur:s.currency||'JPY', jpy:s.priceJpy||0, thb:s.priceThb||0, qty:1, min:s.min||1, usedFor:s.usedFor||[], imgData:s.img||'' });
-  document.getElementById('rs-search').value='';
-  document.getElementById('rs-results').innerHTML='';
-  renderRsCart();
+window.calcRsCost = function() {
+  const cur = document.getElementById('rs-cur').value;
+  const jpy = parseFloat(document.getElementById('rs-jpy').value)||0;
+  const thb = parseFloat(document.getElementById('rs-thb').value)||0;
+  const fake = {currency:cur,priceJpy:jpy,priceThb:thb};
+  const cost = calcCostThb(fake);
+  const sell = calcSell(cost);
+  document.getElementById('rs-cost').value = cost>0 ? fmtD(cost)+' ฿' : '';
+  document.getElementById('rs-sell').value = sell>0 ? fmt(sell)+' ฿' : '';
+  document.getElementById('rs-mg').textContent = window.localData.settings.margin||45;
 }
 
-window.addRsCustomItem = function() {
-  window.rsCart.push({ stockId:null, model:'', cur:'JPY', jpy:0, thb:0, qty:1, min:1, usedFor:[], imgData:'' });
-  renderRsCart();
-}
-
-const USED_FOR_OPTIONS = ['FL-60X','FL-61X','FLZ-0220','FL-2XX','FL-2XXX~FL-3XXX'];
-
-window.renderRsCart = function() {
-  const c = document.getElementById('rs-cart');
-  if (!window.rsCart.length) { c.innerHTML='<div class="empty">ยังไม่มีรายการ</div>'; return; }
-  c.innerHTML = window.rsCart.map((item, i) => {
-    const cost = calcCostThb({currency:item.cur,priceJpy:item.jpy,priceThb:item.thb});
-    const sell = calcSell(cost);
-    const usedChecks = USED_FOR_OPTIONS.map(u =>
-      `<label style="display:flex;align-items:center;gap:4px;font-size:11px;font-weight:400;cursor:pointer;color:var(--text)">
-        <input type="checkbox" value="${u}" ${(item.usedFor||[]).includes(u)?'checked':''} onchange="rsCartUsedFor(${i},this)"> ${u}
-      </label>`).join('');
-    const imgPrev = item.imgData ? `<img src="${item.imgData}" style="height:50px;border-radius:5px;margin-top:4px">` : `<span style="font-size:11px;color:var(--text3)">📷 แนบรูป</span>`;
-    return `<div class="cart-row" style="margin-bottom:12px">
-      <div class="flex gap8" style="margin-bottom:8px;align-items:center">
-        ${item.stockId
-          ? `<b style="flex:1;font-size:12px">${item.model}</b>`
-          : `<input type="text" value="${item.model}" placeholder="Model สินค้า *" style="flex:1;font-size:12px" onchange="rsCart[${i}].model=this.value.trim()">`
-        }
-        <button class="btn btn-danger btn-icon btn-sm" onclick="rsCart.splice(${i},1);renderRsCart()">✕</button>
-      </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr 1fr 1fr;gap:8px;align-items:end;margin-bottom:8px">
-        <div><label>สกุลเงิน</label>
-          <select style="font-size:12px" onchange="rsCart[${i}].cur=this.value;renderRsCart()">
-            <option value="JPY" ${item.cur==='JPY'?'selected':''}>JPY</option>
-            <option value="THB" ${item.cur==='THB'?'selected':''}>THB</option>
-          </select>
-        </div>
-        <div><label>${item.cur==='JPY'?'ราคา JPY':'ราคา THB'}</label>
-          <input type="number" value="${item.cur==='JPY'?item.jpy:item.thb}" style="font-size:12px" onchange="if(rsCart[${i}].cur==='JPY'){rsCart[${i}].jpy=parseFloat(this.value)||0;}else{rsCart[${i}].thb=parseFloat(this.value)||0;}renderRsCart()">
-        </div>
-        <div><label>จำนวน *</label><input type="number" value="${item.qty}" min="1" style="font-size:12px" onchange="rsCart[${i}].qty=parseInt(this.value)||1;renderRsCart()"></div>
-        <div><label>Min Stock</label><input type="number" value="${item.min}" min="1" style="font-size:12px" onchange="rsCart[${i}].min=parseInt(this.value)||1"></div>
-        <div><label>ต้นทุน/ชิ้น</label><input type="text" value="${cost>0?fmtD(cost)+' ฿':''}" readonly style="font-size:12px;color:var(--accent)"></div>
-      </div>
-      <div style="margin-bottom:6px">
-        <label style="display:block;margin-bottom:4px">ใช้สำหรับ Model</label>
-        <div style="display:flex;flex-wrap:wrap;gap:8px">${usedChecks}</div>
-      </div>
-      <div>
-        <label style="display:block;margin-bottom:4px;cursor:pointer" onclick="document.getElementById('rs-img-${i}').click()">${imgPrev}</label>
-        <input type="file" id="rs-img-${i}" accept="image/*" capture="environment" style="display:none" onchange="handleRsCartImg(event,${i})">
-      </div>
-    </div>`;
-  }).join('');
-}
-
-window.rsCartUsedFor = function(i, cb) {
-  const arr = window.rsCart[i].usedFor = window.rsCart[i].usedFor||[];
-  if (cb.checked) { if(!arr.includes(cb.value)) arr.push(cb.value); }
-  else { const idx=arr.indexOf(cb.value); if(idx>=0) arr.splice(idx,1); }
-}
-
-window.handleRsCartImg = function(e, i) {
-  const f=e.target.files[0]; if(!f) return;
-  const r=new FileReader();
-  r.onload=ev=>{ window.rsCart[i].imgData=ev.target.result; renderRsCart(); };
+window.handleRsImg = function(e) {
+  const f = e.target.files[0]; if(!f) return;
+  const r = new FileReader();
+  r.onload = ev => {
+    window.rsImgData = ev.target.result;
+    document.getElementById('rs-img-prev').innerHTML = `<img src="${ev.target.result}" style="height:70px;border-radius:6px">`;
+  };
   r.readAsDataURL(f);
 }
 
 window.saveRestock = async function() {
+  const model = document.getElementById('rs-model').value.trim();
   const po = document.getElementById('rs-po').value.trim();
-  const date = document.getElementById('rs-date').value;
-  const missingRs = [];
-  if (!date) missingRs.push('วันที่เติม');
-  if (!po) missingRs.push('เลขที่ PO');
-  if (!window.rsCart.length) missingRs.push('รายการสินค้า (เพิ่มอย่างน้อย 1 รายการ)');
-  if (missingRs.length) { toast('❌ กรุณากรอก: ' + missingRs.join(', '), 'var(--red)'); return; }
+  const qty = parseInt(document.getElementById('rs-qty').value)||0;
+  if (!model||!po||qty<=0) { toast('กรอกข้อมูลให้ครบ','var(--red)'); return; }
+  const cur = document.getElementById('rs-cur').value;
+  const jpy = parseFloat(document.getElementById('rs-jpy').value)||0;
+  const thb = parseFloat(document.getElementById('rs-thb').value)||0;
+  const min = parseInt(document.getElementById('rs-min').value)||1;
+  const cost = calcCostThb({currency:cur,priceJpy:jpy,priceThb:thb});
 
-  // validate each item
-  for (let i=0; i<window.rsCart.length; i++) {
-    const item = window.rsCart[i];
-    const itemMissing = [];
-    if (!item.model.trim()) itemMissing.push(`รายการที่ ${i+1}: Model สินค้า`);
-    if (item.qty <= 0) itemMissing.push(`รายการที่ ${i+1}: จำนวน`);
-    if (itemMissing.length) { toast('❌ กรุณากรอก: ' + itemMissing.join(', '), 'var(--red)'); return; }
+  // หา/สร้าง stock
+  const existing = window.localData.stocks.find(s=>s.model===model&&s.po===po);
+  if (existing) {
+    await dbSet('stocks', existing.id, {
+      ...existing, qty: (existing.qty||0)+qty,
+      currency:cur, priceJpy:jpy, priceThb:thb, min,
+      img: window.rsImgData||existing.img
+    });
+  } else {
+    await dbAdd('stocks', { model, po, currency:cur, priceJpy:jpy, priceThb:thb, qty, min, img:window.rsImgData });
   }
 
-  for (const item of window.rsCart) {
-    const cost = calcCostThb({currency:item.cur, priceJpy:item.jpy, priceThb:item.thb});
-    const existing = window.localData.stocks.find(s=>s.model===item.model && s.po===po);
-    if (existing) {
-      await dbSet('stocks', existing.id, {
-        ...existing, qty:(existing.qty||0)+item.qty,
-        currency:item.cur, priceJpy:item.jpy, priceThb:item.thb, min:item.min,
-        usedFor:item.usedFor.length ? item.usedFor : (existing.usedFor||[]),
-        img: item.imgData || existing.img
-      });
-    } else {
-      await dbAdd('stocks', { model:item.model, po, currency:item.cur, priceJpy:item.jpy, priceThb:item.thb, qty:item.qty, min:item.min, usedFor:item.usedFor, img:item.imgData });
-    }
-    await dbAdd('restockLog', { date, model:item.model, po, currency:item.cur, jpy:item.jpy, thb:item.thb, qty:item.qty, costThb:cost, usedFor:item.usedFor, createdAt:Date.now() });
-  }
-  const count = window.rsCart.length;
-  clearRestock();
-  toast(`✅ เติมสินค้า ${count} รายการแล้ว`);
+  // บันทึก log
+  await dbAdd('restockLog', { date:document.getElementById('rs-date').value, model, po, currency:cur, jpy, thb, qty, costThb:cost });
+  clearRestock(); toast('✅ เติมสินค้า '+qty+' ชิ้นแล้ว');
   if (!window.isFirebase) { renderStock(); renderDashboard(); renderRestockLog(); updateModelDL(); updateBadge(); }
 }
 
 window.clearRestock = function() {
-  window.rsCart=[];
-  document.getElementById('rs-po').value='';
-  document.getElementById('rs-search').value='';
-  document.getElementById('rs-results').innerHTML='';
-  renderRsCart();
+  ['rs-model','rs-po','rs-jpy','rs-thb','rs-qty','rs-cost','rs-sell'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('rs-min').value='1';
+  document.getElementById('rs-cur').value='JPY';
+  document.getElementById('rs-jpy-g').style.display='';
+  document.getElementById('rs-thb-g').style.display='none';
+  document.getElementById('rs-img-prev').innerHTML='📷<br><span style="font-size:12px;color:var(--text2)">คลิกเพื่อแนบรูป / ถ่ายรูปจากกล้อง</span>';
+  window.rsImgData='';
   initDates();
 }
-
-window.toggleRsCurrency = function() {} // legacy stub
-window.calcRsCost = function() {} // legacy stub
-window.handleRsImg = function() {} // legacy stub
 
 window.renderRestockLog = function() {
   const logs = window.localData.restockLog.slice(0,20);
@@ -1164,7 +1085,7 @@ window.renderWdResults = function() {
   const q = document.getElementById('wd-search').value.toLowerCase();
   const res = document.getElementById('wd-results');
   if (!q) { res.innerHTML=''; return; }
-  const items = [...window.localData.stocks].sort((a,b)=>a.model.localeCompare(b.model,'th')).filter(s=>
+  const items = window.localData.stocks.filter(s=>
     s.model.toLowerCase().includes(q) || (s.po||'').toLowerCase().includes(q)
   );
   if (!items.length) { res.innerHTML='<div class="empty">ไม่พบสินค้า</div>'; return; }
@@ -1236,10 +1157,7 @@ window.updateWdTotals = function() {
 window.confirmWithdraw = async function() {
   if (!window.wdCart.length) { toast('ไม่มีรายการ','var(--red)'); return; }
   const name = document.getElementById('wd-name').value.trim();
-  const missingWd = [];
-  if (!name) missingWd.push('ชื่อผู้เบิก');
-  if (!document.getElementById('wd-date').value) missingWd.push('วันที่');
-  if (missingWd.length) { toast('❌ กรุณากรอก: ' + missingWd.join(', '), 'var(--red)'); return; }
+  if (!name) { toast('กรอกชื่อผู้เบิก','var(--red)'); return; }
   const date=document.getElementById('wd-date').value, job=document.getElementById('wd-job').value.trim(),
         qt=document.getElementById('wd-qt').value.trim(), customer=document.getElementById('wd-cust').value.trim(),
         poStatus=document.getElementById('wd-po').value, remark=document.getElementById('wd-remark').value.trim();
@@ -1270,39 +1188,26 @@ window.clearWithdraw = function() {
 window.renderHistory = function() {
   const q=(document.getElementById('hist-search')?.value||'').toLowerCase();
   const f=document.getElementById('hist-filter')?.value||'';
-  const typeF=(document.getElementById('hist-type-filter')?.value||'');
-
-  // merge withdraw history + restock log into one timeline
-  const withdraws = window.localData.history.map(h=>({...h,_type:'withdraw'}));
-  const restocks = window.localData.restockLog.map(r=>({...r,_type:'restock'}));
-  const allEntries = [...withdraws,...restocks].sort((a,b)=>(b.createdAt||0)-(a.createdAt||0));
-
   let html='', idx=0;
-  allEntries.forEach(h => {
-    if (typeF && h._type !== typeF) return;
-    if (f && h._type==='withdraw' && h.poStatus!==f) return;
-    if (q && ![h.model,h.customer||'',h.name||'',h.job||'',h.qt||'',h.po||''].join(' ').toLowerCase().includes(q)) return;
+  const histArr = applySortHistory(window.localData.history);
+  histArr.forEach((h,i) => {
+    if (f && h.poStatus!==f) return;
+    if (q && ![h.model,h.customer,h.name,h.job,h.qt].join(' ').toLowerCase().includes(q)) return;
     idx++;
-    const isRestock = h._type==='restock';
-    const typeBadge = isRestock
-      ? '<span class="badge" style="background:rgba(16,185,129,0.15);color:#10b981;font-size:10px;white-space:nowrap">➕ เติม</span>'
-      : '<span class="badge" style="background:rgba(59,130,246,0.15);color:#3b82f6;font-size:10px;white-space:nowrap">📤 เบิก</span>';
-    const po = h.poStatus==='has_po'?'<span class="badge bg">✅ PO</span>':isRestock?'':'<span class="badge by">⏳ รอ</span>';
+    const po = h.poStatus==='has_po'?'<span class="badge bg">✅ PO</span>':'<span class="badge by">⏳ รอ</span>';
     html += `<tr>
-      <td>${typeBadge}</td>
       <td class="mono t2">${idx}</td><td>${h.date||''}</td>
-      <td class="mono t2">${isRestock ? h.po||'—' : h.job||'—'}</td>
-      <td class="mono t2">${isRestock ? '—' : h.qt||'—'}</td>
-      <td style="max-width:110px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${isRestock?'—':h.customer||'—'}</td>
-      <td>${isRestock?h.po||'—':h.name||'—'}</td><td><b>${h.model||''}</b></td>
+      <td class="mono t2">${h.job||'—'}</td><td class="mono t2">${h.qt||'—'}</td>
+      <td style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${h.customer||'—'}</td>
+      <td>${h.name||'—'}</td><td><b>${h.model||''}</b></td>
       <td class="mono">${h.qty||1}</td>
       <td class="mono ta">฿${fmt(Math.round(h.costThb||0))}</td>
-      <td class="mono tg">${isRestock?'—':'฿'+fmt(h.sellThb||0)}</td>
+      <td class="mono tg">฿${fmt(h.sellThb||0)}</td>
       <td>${po}</td>
-      <td>${isRestock?'': '<button class="btn btn-ghost btn-icon btn-sm" onclick="openEditHist(''+h.id+'')">✏️</button>'}</td>
+      <td><button class="btn btn-ghost btn-icon btn-sm" onclick="openEditHist('${h.id}')">✏️</button></td>
     </tr>`;
   });
-  document.getElementById('hist-tbody').innerHTML = html || '<tr><td colspan="13" class="empty">ยังไม่มีประวัติ</td></tr>';
+  document.getElementById('hist-tbody').innerHTML = html || `<tr><td colspan="12" class="empty">ไม่พบรายการ</td></tr>`;
 }
 
 window.openEditHist = function(id) {
@@ -1346,7 +1251,6 @@ window.renderCustomers = function() {
     if (q && !c.name.toLowerCase().includes(q)) return;
     html+=`<tr>
       <td class="mono t2">${i+1}</td><td><b>${c.name}</b></td>
-      <td style="font-size:12px">${c.dept||'—'}</td>
       <td style="font-size:12px">${c.addr||'—'}</td>
       <td>${c.contact||'—'}</td><td class="mono t2">${c.tel||'—'}</td>
       <td style="font-size:12px">${c.email||'—'}</td>
@@ -1356,14 +1260,14 @@ window.renderCustomers = function() {
       </td>
     </tr>`;
   });
-  document.getElementById('cust-tbody').innerHTML = html || `<tr><td colspan="8" class="empty">ไม่พบลูกค้า</td></tr>`;
+  document.getElementById('cust-tbody').innerHTML = html || `<tr><td colspan="7" class="empty">ไม่พบลูกค้า</td></tr>`;
   updateCustDL();
 }
 
 window.openCustModal = function() {
   document.getElementById('mc-id').value='';
   document.getElementById('mc-title').textContent='เพิ่มลูกค้า';
-  ['mc-name','mc-dept','mc-addr','mc-contact','mc-tel','mc-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  ['mc-name','mc-addr','mc-contact','mc-tel','mc-email'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
   openModal('modal-cust');
 }
 
@@ -1372,7 +1276,6 @@ window.openEditCust = function(id) {
   document.getElementById('mc-id').value=id;
   document.getElementById('mc-title').textContent='แก้ไขลูกค้า';
   document.getElementById('mc-name').value=c.name;
-  document.getElementById('mc-dept').value=c.dept||'';
   document.getElementById('mc-addr').value=c.addr||'';
   document.getElementById('mc-contact').value=c.contact||'';
   document.getElementById('mc-tel').value=c.tel||'';
@@ -1382,8 +1285,8 @@ window.openEditCust = function(id) {
 
 window.saveCust = async function() {
   const name=document.getElementById('mc-name').value.trim();
-  if(!name){toast('❌ กรุณากรอก: ชื่อบริษัท / ลูกค้า','var(--red)');return;}
-  const data={name,dept:document.getElementById('mc-dept').value.trim(),addr:document.getElementById('mc-addr').value,contact:document.getElementById('mc-contact').value,tel:document.getElementById('mc-tel').value,email:document.getElementById('mc-email').value};
+  if(!name){toast('กรอกชื่อลูกค้า','var(--red)');return;}
+  const data={name,addr:document.getElementById('mc-addr').value,contact:document.getElementById('mc-contact').value,tel:document.getElementById('mc-tel').value,email:document.getElementById('mc-email').value};
   const id=document.getElementById('mc-id').value;
   if(id) await dbSet('customers',id,data); else await dbAdd('customers',data);
   closeModal('modal-cust'); toast(id?'แก้ไขลูกค้าแล้ว':'เพิ่มลูกค้าแล้ว');
@@ -1417,11 +1320,12 @@ window.saveSettings = async function() {
   };
   window.localData.settings=s;
   await dbSaveSettings(s);
+  document.getElementById('rs-mg').textContent=s.margin;
 }
 
 // ============ DATALISTS ============
 window.updateModelDL = function() {
-  const models=[...new Set(window.localData.stocks.map(s=>s.model))].sort((a,b)=>a.localeCompare(b,'th'));
+  const models=[...new Set(window.localData.stocks.map(s=>s.model))];
   document.getElementById('model-dl').innerHTML=models.map(m=>`<option value="${m}">`).join('');
 }
 
@@ -1468,7 +1372,6 @@ window.showPage = function(id, btn) {
   if (btn) btn.classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id]||id;
   if (id==='withdraw') { renderCart(); updateCustDL(); initDates(); }
-  if (id==='restock') { renderRsResults && renderRsResults(); initDates(); }
   if (id==='stock') renderStock();
   if (id==='history') renderHistory();
   if (id==='customers') renderCustomers();
@@ -1608,244 +1511,40 @@ function loadSheetJS(cb) {
   s.onload = cb; document.head.appendChild(s);
 }
 
-// EXPORT EXCEL (styled)
+// EXPORT EXCEL
 window.exportExcel = function(type) {
   loadSheetJS(() => {
     const wb = XLSX.utils.book_new();
-    const today = new Date().toLocaleDateString('th-TH');
-
-    // ── helper: apply style to range ──
-    function styleRange(ws, range, style) {
-      const [tl, br] = range.split(':');
-      const decode = XLSX.utils.decode_cell;
-      const encode = XLSX.utils.encode_cell;
-      const s = decode(tl), e = br ? decode(br) : decode(tl);
-      for (let r = s.r; r <= e.r; r++) {
-        for (let c = s.c; c <= e.c; c++) {
-          const addr = encode({r,c});
-          if (!ws[addr]) ws[addr] = {v:'', t:'s'};
-          ws[addr].s = Object.assign({}, ws[addr].s||{}, style);
-        }
-      }
-    }
-
-    const BLUE   = '0A0F1E'; // dark bg
-    const BLUE2  = '1E3A5F'; // header
-    const ACCENT = '3B82F6'; // bright blue
-    const GREEN  = '10B981';
-    const RED    = 'EF4444';
-    const AMBER  = 'F59E0B';
-    const GRAY   = 'F1F5F9';
-    const DGRAY  = '94A3B8';
-    const WHITE  = 'FFFFFF';
-    const ROW1   = 'EFF6FF'; // light blue row
-    const ROW2   = 'F8FAFC'; // near white row
-
-    const hdrStyle = {
-      font: {bold:true, color:{rgb:WHITE}, sz:11},
-      fill: {fgColor:{rgb:BLUE2}, patternType:'solid'},
-      alignment: {horizontal:'center', vertical:'center', wrapText:true},
-      border: {top:{style:'thin',color:{rgb:ACCENT}}, bottom:{style:'thin',color:{rgb:ACCENT}}, left:{style:'thin',color:{rgb:'2A3A56'}}, right:{style:'thin',color:{rgb:'2A3A56'}}}
-    };
-    const titleStyle = {
-      font: {bold:true, color:{rgb:ACCENT}, sz:14},
-      fill: {fgColor:{rgb:BLUE}, patternType:'solid'},
-      alignment: {horizontal:'left', vertical:'center'}
-    };
-    const subStyle = {
-      font: {color:{rgb:DGRAY}, sz:10},
-      fill: {fgColor:{rgb:BLUE}, patternType:'solid'},
-      alignment: {horizontal:'left', vertical:'center'}
-    };
-    const cellBorder = {top:{style:'thin',color:{rgb:'DBEAFE'}}, bottom:{style:'thin',color:{rgb:'DBEAFE'}}, left:{style:'thin',color:{rgb:'E2E8F0'}}, right:{style:'thin',color:{rgb:'E2E8F0'}}};
-
-    let filename;
-
+    let ws, filename;
     if (type === 'stock') {
-      const stocks = window.localData.stocks;
-      const headers = ['Model','PO No.','Currency','Price (JPY)','Price (THB)','ต้นทุน/ชิ้น','ราคาขาย','คงเหลือ','Min','ประเภท','Supplier','ใช้สำหรับ Model','สถานะ','รูปภาพ (Base64)'];
-      const rows = [
-        ['FUKUDA Stock Report', '', '', '', '', '', '', '', '', '', '', '', '', ''],
-        [`วันที่ Export: ${today}  |  สินค้าทั้งหมด: ${stocks.length} รายการ`, '', '', '', '', '', '', '', '', '', '', '', '', ''],
-        [],
-        headers,
-      ];
-      stocks.forEach(s => {
+      const rows = [['Model','PO No','Currency','Price JPY','Price THB','Cost THB/pc','Sell Price THB','QTY','Min Stock','Status']];
+      window.localData.stocks.forEach(s => {
         const cost = calcCostThb(s), sell = calcSell(cost), st = getStatus(s);
-        const usedFor = Array.isArray(s.usedFor) ? s.usedFor.join(', ') : (s.usedFor||'');
-        rows.push([
-          s.model, s.po||'', s.currency||'JPY',
-          s.currency==='JPY' ? (s.priceJpy||0) : '',
-          s.currency==='THB' ? (s.priceThb||0) : '',
-          Math.round(cost), sell,
-          s.qty||0, s.min||1,
-          s.category||'', s.supplier||'', usedFor,
-          st.label, s.img||''
-        ]);
+        rows.push([s.model, s.po||'', s.currency||'JPY', s.priceJpy||0, s.priceThb||0, Math.round(cost), sell, s.qty||0, s.min||1, st.label]);
       });
-
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      const numCols = headers.length;
-      const lastCol = XLSX.utils.encode_col(numCols - 1);
-      const lastRow = rows.length - 1;
-
-      // merge title rows
-      ws['!merges'] = [
-        {s:{r:0,c:0}, e:{r:0,c:numCols-1}},
-        {s:{r:1,c:0}, e:{r:1,c:numCols-1}},
-        {s:{r:2,c:0}, e:{r:2,c:numCols-1}},
-      ];
-
-      // row heights
-      ws['!rows'] = [{hpt:28},{hpt:18},{hpt:6},{hpt:32}];
-
-      // col widths
-      ws['!cols'] = [{wch:28},{wch:16},{wch:9},{wch:12},{wch:12},{wch:14},{wch:12},{wch:9},{wch:7},{wch:14},{wch:18},{wch:24},{wch:10},{wch:30}];
-
-      // Title row style
-      styleRange(ws, 'A1:'+lastCol+'1', titleStyle);
-      styleRange(ws, 'A2:'+lastCol+'2', subStyle);
-      styleRange(ws, 'A3:'+lastCol+'3', {fill:{fgColor:{rgb:BLUE}, patternType:'solid'}});
-
-      // Header row style (row 4 = index 3)
-      for (let c = 0; c < numCols; c++) {
-        const addr = XLSX.utils.encode_cell({r:3, c});
-        if (!ws[addr]) ws[addr] = {v:headers[c], t:'s'};
-        ws[addr].s = hdrStyle;
-      }
-
-      // Data rows
-      for (let r = 4; r <= lastRow; r++) {
-        const isEven = (r % 2 === 0);
-        const rowFill = {fgColor:{rgb: isEven ? ROW1 : ROW2}, patternType:'solid'};
-        for (let c = 0; c < numCols; c++) {
-          const addr = XLSX.utils.encode_cell({r, c});
-          if (!ws[addr]) ws[addr] = {v:'', t:'s'};
-          const isNum = [3,4,5,6,7,8].includes(c);
-          ws[addr].s = {
-            fill: rowFill,
-            border: cellBorder,
-            font: {sz:10, bold: c===0},
-            alignment: {horizontal: isNum ? 'right' : 'left', vertical:'center'}
-          };
-          // color status column (col 12)
-          if (c === 12) {
-            const v = ws[addr].v||'';
-            const sc = v.includes('หมด') ? RED : v.includes('ต่ำ') ? AMBER : GREEN;
-            ws[addr].s.font = {sz:10, bold:true, color:{rgb:sc}};
-          }
-          // image col (col 13) - truncate display
-          if (c === 13) {
-            ws[addr].s.font = {sz:9, color:{rgb:DGRAY}};
-            ws[addr].s.alignment = {horizontal:'left', vertical:'center', wrapText:false};
-          }
-          // color sell price (col 6)
-          if (c === 6) ws[addr].s.font = {sz:10, color:{rgb:GREEN}};
-          // color cost (col 5)
-          if (c === 5) ws[addr].s.font = {sz:10, color:{rgb:ACCENT}};
-          // number format
-          if ([3,4,5,6].includes(c)) ws[addr].z = '#,##0';
-        }
-      }
-
+      ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [{wch:30},{wch:15},{wch:8},{wch:12},{wch:12},{wch:14},{wch:14},{wch:8},{wch:8},{wch:10}];
       XLSX.utils.book_append_sheet(wb, ws, 'Stock');
-      filename = `FUKUDA_Stock_${new Date().toISOString().slice(0,10)}.xlsx`;
-
+      filename = 'stock_fukuda.xlsx';
     } else {
-      // ── HISTORY SHEET ──
-      const hist = window.localData.history;
-      const headers = ['#','วันที่','Job No.','QT No.','ลูกค้า','ผู้เบิก','Model','PO Ref','จำนวน','ต้นทุน THB','ราคาขาย THB','สถานะ PO','หมายเหตุ'];
-      const totalSell = hist.reduce((a,h)=>a+(h.sellThb||0)*(h.qty||1),0);
-      const totalCost = hist.reduce((a,h)=>a+(h.costThb||0)*(h.qty||1),0);
-      const noPO = hist.filter(h=>h.poStatus==='no_po').length;
-
-      const rows = [
-        ['FUKUDA History Report','','','','','','','','','','','',''],
-        [`วันที่ Export: ${today}  |  รายการทั้งหมด: ${hist.length}  |  รวมราคาขาย: ฿${totalSell.toLocaleString()}`, '','','','','','','','','','','',''],
-        [],
-        headers,
-      ];
-      hist.forEach((h,i) => {
-        rows.push([i+1, h.date||'', h.job||'', h.qt||'', h.customer||'', h.name||'', h.model||'', h.poRef||'', h.qty||1, Math.round(h.costThb||0), h.sellThb||0, h.poStatus==='has_po'?'✅ มี PO':'⏳ ยังไม่มี', h.remark||'']);
+      const rows = [['No','Date','Job No','QT No','Customer','Name','Model','PO Ref','QTY','Cost THB','Sell THB','PO Status','Remark']];
+      window.localData.history.forEach((h,i) => {
+        rows.push([i+1, h.date||'', h.job||'', h.qt||'', h.customer||'', h.name||'', h.model||'', h.poRef||'', h.qty||1, Math.round(h.costThb||0), h.sellThb||0, h.poStatus==='has_po'?'มี PO':'ยังไม่มี PO', h.remark||'']);
       });
-
-      const ws = XLSX.utils.aoa_to_sheet(rows);
-      const numCols = headers.length;
-      const lastCol = XLSX.utils.encode_col(numCols-1);
-      const lastRow = rows.length - 1;
-
-      ws['!merges'] = [
-        {s:{r:0,c:0},e:{r:0,c:numCols-1}},
-        {s:{r:1,c:0},e:{r:1,c:numCols-1}},
-        {s:{r:2,c:0},e:{r:2,c:numCols-1}},
-      ];
-      ws['!rows'] = [{hpt:28},{hpt:18},{hpt:6},{hpt:32}];
-      ws['!cols'] = [{wch:5},{wch:12},{wch:14},{wch:14},{wch:26},{wch:14},{wch:28},{wch:14},{wch:7},{wch:14},{wch:14},{wch:14},{wch:22}];
-
-      styleRange(ws, 'A1:'+lastCol+'1', titleStyle);
-      styleRange(ws, 'A2:'+lastCol+'2', subStyle);
-      styleRange(ws, 'A3:'+lastCol+'3', {fill:{fgColor:{rgb:BLUE}, patternType:'solid'}});
-
-      for (let c = 0; c < numCols; c++) {
-        const addr = XLSX.utils.encode_cell({r:3,c});
-        if (!ws[addr]) ws[addr] = {v:headers[c], t:'s'};
-        ws[addr].s = hdrStyle;
-      }
-
-      for (let r = 4; r <= lastRow; r++) {
-        const isEven = r % 2 === 0;
-        const rowFill = {fgColor:{rgb: isEven ? ROW1 : ROW2}, patternType:'solid'};
-        for (let c = 0; c < numCols; c++) {
-          const addr = XLSX.utils.encode_cell({r,c});
-          if (!ws[addr]) ws[addr] = {v:'', t:'s'};
-          const isNum = [8,9,10].includes(c);
-          ws[addr].s = {
-            fill: rowFill, border: cellBorder,
-            font: {sz:10, bold: c===0},
-            alignment: {horizontal: isNum ? 'right' : c===0 ? 'center' : 'left', vertical:'center'}
-          };
-          if (c===10) ws[addr].s.font = {sz:10, color:{rgb:GREEN}, bold:true};
-          if (c===9)  ws[addr].s.font = {sz:10, color:{rgb:ACCENT}};
-          if ([9,10].includes(c)) ws[addr].z = '#,##0';
-          if (c===11) {
-            const hasPO = (ws[addr].v||'').includes('มี PO') && !(ws[addr].v||'').includes('ยัง');
-            ws[addr].s.font = {sz:10, bold:true, color:{rgb: hasPO ? GREEN : AMBER}};
-          }
-        }
-      }
-
+      ws = XLSX.utils.aoa_to_sheet(rows);
+      ws['!cols'] = [{wch:5},{wch:12},{wch:14},{wch:14},{wch:30},{wch:15},{wch:30},{wch:15},{wch:6},{wch:12},{wch:12},{wch:14},{wch:20}];
       XLSX.utils.book_append_sheet(wb, ws, 'History');
-
-      // ── SUMMARY SHEET ──
-      const sw = XLSX.utils.aoa_to_sheet([
-        ['FUKUDA Summary',''],
-        ['',''],
-        ['📊 สรุปภาพรวม', ''],
-        ['รายการเบิกทั้งหมด', hist.length],
-        ['รวมต้นทุน (THB)', Math.round(totalCost)],
-        ['รวมราคาขาย (THB)', Math.round(totalSell)],
-        ['กำไรรวม (THB)', Math.round(totalSell - totalCost)],
-        ['รายการยังไม่มี PO', noPO],
-        ['',''],
-        ['📦 สินค้าที่เบิกบ่อยที่สุด (Top 5)', ''],
-      ]);
-      // Top 5 models
-      const modelCount = {};
-      hist.forEach(h => { modelCount[h.model] = (modelCount[h.model]||0) + (h.qty||1); });
-      Object.entries(modelCount).sort((a,b)=>b[1]-a[1]).slice(0,5).forEach(([m,q],i) => {
-        XLSX.utils.sheet_add_aoa(sw, [[`${i+1}. ${m}`, q + ' ชิ้น']], {origin:-1});
-      });
-      sw['!cols'] = [{wch:32},{wch:20}];
-      sw['!merges'] = [{s:{r:0,c:0},e:{r:0,c:1}}];
-
-      // style summary
-      if (sw['A1']) sw['A1'].s = titleStyle;
-      if (sw['A3']) sw['A3'].s = {font:{bold:true,sz:12,color:{rgb:ACCENT}}, fill:{fgColor:{rgb:BLUE2},patternType:'solid'}};
-
-      XLSX.utils.book_append_sheet(wb, sw, 'Summary');
-      filename = `FUKUDA_History_${new Date().toISOString().slice(0,10)}.xlsx`;
+      // เพิ่ม sheet summary
+      const sumRows = [
+        ['สรุปการเบิกสินค้า FUKUDA','',''],
+        ['จำนวนรายการทั้งหมด', window.localData.history.length, 'รายการ'],
+        ['รวมราคาขาย', window.localData.history.reduce((a,h)=>a+(h.sellThb||0)*(h.qty||1),0), 'THB'],
+        ['รายการที่ยังไม่มี PO', window.localData.history.filter(h=>h.poStatus==='no_po').length, 'รายการ'],
+      ];
+      const ws2 = XLSX.utils.aoa_to_sheet(sumRows);
+      XLSX.utils.book_append_sheet(wb, ws2, 'Summary');
+      filename = 'history_fukuda.xlsx';
     }
-
     XLSX.writeFile(wb, filename);
     toast('📥 Export Excel แล้ว');
   });
@@ -1882,7 +1581,6 @@ window.importStockFile = async function(e) {
       thb: cleanH.findIndex(h => h.includes('thb') && (h.includes('price') || h.includes('ราคา')) && !h.includes('cost') && !h.includes('sell') && !h.includes('ต้นทุน')),
       qty: cleanH.findIndex(h => h.includes("q'ty") || h.includes("qty") || h.includes('คงเหลือ') || h.includes('จำนวน')),
       min: cleanH.findIndex(h => h.includes('min')),
-      img: cleanH.findIndex(h => h.includes('รูป') || h.includes('image') || h.includes('img') || h.includes('base64')),
     };
 
     // fallback: ถ้าหา jpy ไม่เจอให้ลองหาแบบกว้างกว่า
@@ -1911,14 +1609,11 @@ window.importStockFile = async function(e) {
         priceThb: isTHB && colIdx.thb >= 0 ? parsePrice(row[colIdx.thb]) : 0,
         qty: colIdx.qty >= 0 ? parseInt(row[colIdx.qty])||0 : 0,
         min: colIdx.min >= 0 ? parseInt(row[colIdx.min])||1 : 1,
-        img: colIdx.img >= 0 ? String(row[colIdx.img]||'').trim() : ''
+        img: ''
       };
-      // match by model name only — keep existing image if import has no image
-      const existing = window.localData.stocks.find(s => s.model===model);
-      if (existing) {
-        await dbSet('stocks', existing.id, {...data, img: data.img || existing.img||''});
-        updated++;
-      } else { await dbAdd('stocks', data); added++; }
+      const existing = window.localData.stocks.find(s => s.model===model && s.po===po);
+      if (existing) { await dbSet('stocks', existing.id, data); updated++; }
+      else { await dbAdd('stocks', data); added++; }
     }
     if (!window.isFirebase) { renderStock(); renderDashboard(); updateModelDL(); updateBadge(); }
     toast(`✅ Import แล้ว: เพิ่ม ${added} / อัพเดต ${updated} รายการ`);
