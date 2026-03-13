@@ -325,54 +325,65 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 
       <!-- RESTOCK -->
       <div class="page" id="page-restock">
-        <div class="card">
-          <div class="card-title">➕ เติมสินค้าเข้า Stock</div>
-          <div class="g3">
-            <div class="fg"><label>วันที่เติม *</label><input type="date" id="rs-date"></div>
-            <div class="fg"><label>Model สินค้า *</label><input type="text" id="rs-model" list="model-dl" placeholder="พิมพ์หรือเลือก"><datalist id="model-dl"></datalist></div>
-            <div class="fg"><label>เลขที่ PO *</label><input type="text" id="rs-po" placeholder="OTL2026-001"></div>
-          </div>
-          <div class="g3">
-            <div class="fg"><label>สกุลเงิน</label>
-              <select id="rs-cur" onchange="toggleRsCurrency()">
-                <option value="JPY">JPY</option><option value="THB">THB</option>
-              </select>
+        <div class="g2 mb12">
+          <!-- ฟอร์มเพิ่มรายการ -->
+          <div class="card">
+            <div class="card-title">➕ เพิ่มรายการสินค้า</div>
+            <div class="g2">
+              <div class="fg"><label>วันที่เติม *</label><input type="date" id="rs-date"></div>
+              <div class="fg"><label>เลขที่ PO *</label><input type="text" id="rs-po" placeholder="OTL2026-001"></div>
             </div>
-            <div class="fg" id="rs-jpy-g"><label>ราคา JPY</label><input type="number" id="rs-jpy" oninput="calcRsCost()"></div>
-            <div class="fg" id="rs-thb-g" style="display:none"><label>ราคา THB</label><input type="number" id="rs-thb" oninput="calcRsCost()"></div>
-            <div class="fg"><label>จำนวนที่เติม *</label><input type="number" id="rs-qty" min="1" oninput="calcRsCost()"></div>
-          </div>
-          <div class="g3">
-            <div class="fg"><label>Min Stock</label><input type="number" id="rs-min" value="1"></div>
-            <div class="fg"><label>ต้นทุน THB/ชิ้น (คำนวณอัตโนมัติ)</label><input type="text" id="rs-cost" readonly></div>
-            <div class="fg"><label>ราคาขาย THB (Margin <span id="rs-mg">45</span>%)</label><input type="text" id="rs-sell" readonly></div>
-          </div>
-          <div class="fg mb16">
-            <label>รูปภาพ (ถ่ายหรือแนบไฟล์)</label>
-            <div class="img-drop" id="rs-drop" onclick="document.getElementById('rs-img').click()">
-              <div id="rs-img-prev">📷<br><span style="font-size:12px;color:var(--text2)">คลิกเพื่อแนบรูป / ถ่ายรูปจากกล้อง</span></div>
+            <div class="fg"><label>Model สินค้า *</label><input type="text" id="rs-model" list="model-dl" placeholder="พิมพ์หรือเลือก Model"><datalist id="model-dl"></datalist></div>
+            <div class="g3">
+              <div class="fg"><label>สกุลเงิน</label>
+                <select id="rs-cur" onchange="toggleRsCurrency()">
+                  <option value="JPY">JPY</option><option value="THB">THB</option>
+                </select>
+              </div>
+              <div class="fg" id="rs-jpy-g"><label>ราคา JPY</label><input type="number" id="rs-jpy" oninput="calcRsCost()"></div>
+              <div class="fg" id="rs-thb-g" style="display:none"><label>ราคา THB</label><input type="number" id="rs-thb" oninput="calcRsCost()"></div>
+              <div class="fg"><label>จำนวน *</label><input type="number" id="rs-qty" min="1" oninput="calcRsCost()"></div>
             </div>
-            <input type="file" id="rs-img" accept="image/*" capture="environment" style="display:none" onchange="handleRsImg(event)">
-          </div>
-          <div class="fg">
-            <label>ใช้สำหรับ Model</label>
-            <div style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 0" id="rs-usedfor-checks">
-              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-60X"> FL-60X</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-61X"> FL-61X</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FLZ-0220"> FLZ-0220</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-2XX"> FL-2XX</label>
-              <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-2XXX~FL-3XXX"> FL-2XXX~FL-3XXX</label>
+            <div class="g3">
+              <div class="fg"><label>Min Stock</label><input type="number" id="rs-min" value="1"></div>
+              <div class="fg"><label>ต้นทุน/ชิ้น (อัตโนมัติ)</label><input type="text" id="rs-cost" readonly></div>
+              <div class="fg"><label>ราคาขาย (Margin <span id="rs-mg">45</span>%)</label><input type="text" id="rs-sell" readonly></div>
             </div>
+            <div class="fg">
+              <label>ใช้สำหรับ Model</label>
+              <div style="display:flex;flex-wrap:wrap;gap:10px;padding:6px 0" id="rs-usedfor-checks">
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-60X"> FL-60X</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-61X"> FL-61X</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FLZ-0220"> FLZ-0220</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-2XX"> FL-2XX</label>
+                <label style="display:flex;align-items:center;gap:5px;font-size:13px;font-weight:400;cursor:pointer;color:var(--text)"><input type="checkbox" value="FL-2XXX~FL-3XXX"> FL-2XXX~FL-3XXX</label>
+              </div>
+            </div>
+            <div class="fg">
+              <label>รูปภาพ</label>
+              <div class="img-drop" id="rs-drop" onclick="document.getElementById('rs-img').click()">
+                <div id="rs-img-prev">📷<br><span style="font-size:12px;color:var(--text2)">คลิกเพื่อแนบรูป / ถ่ายรูปจากกล้อง</span></div>
+              </div>
+              <input type="file" id="rs-img" accept="image/*" capture="environment" style="display:none" onchange="handleRsImg(event)">
+            </div>
+            <button class="btn btn-primary fw" onclick="addRestockItem()">➕ เพิ่มลงรายการ</button>
           </div>
-          <div class="flex gap12">
-            <button class="btn btn-primary" onclick="saveRestock()">✅ บันทึกการเติมสินค้า</button>
-            <button class="btn btn-ghost" onclick="clearRestock()">🔄 ล้าง</button>
+          <!-- รายการที่จะเติม -->
+          <div class="card">
+            <div class="card-title">🛒 รายการที่จะเติม (<span id="rs-cart-count">0</span> รายการ)</div>
+            <div id="rs-cart" style="min-height:80px"></div>
+            <div class="divider"></div>
+            <div class="flex gap12">
+              <button class="btn btn-ghost btn-sm" onclick="clearRestock()">🔄 ล้างทั้งหมด</button>
+              <div style="flex:1"></div>
+              <button class="btn btn-success" id="rs-confirm-btn" onclick="saveRestock()" style="display:none">✅ ยืนยันเติมสินค้าทั้งหมด</button>
+            </div>
           </div>
         </div>
         <div class="card">
           <div class="card-title">📜 ประวัติการเติม (ล่าสุด 20 รายการ)</div>
           <div class="tbl-wrap">
-            <table><thead><tr><th>วันที่</th><th>Model</th><th>PO</th><th>สกุลเงิน</th><th>ราคา</th><th>จำนวน</th><th>ต้นทุน THB/ชิ้น</th></tr></thead>
+            <table><thead><tr><th>วันที่</th><th>Model</th><th>PO</th><th>สกุลเงิน</th><th>ราคา</th><th>จำนวน</th><th>ต้นทุน THB/ชิ้น</th><th>ใช้สำหรับ Model</th></tr></thead>
             <tbody id="restock-log"></tbody></table>
           </div>
         </div>
@@ -612,6 +623,7 @@ window.localData = {
   settings: { rate:0.25, tax:10, fwd:15, margin:45, email:'' }
 };
 window.wdCart = [];
+window.rsCart = [];
 window.rsImgData = '';
 window.msImgData = '';
 window.unsubscribers = [];
@@ -1010,6 +1022,8 @@ window.handleMsImg = function(e) {
 }
 
 // ============ RESTOCK ============
+window.rsCart = []; // multi-item cart
+
 window.toggleRsCurrency = function() {
   const c = document.getElementById('rs-cur').value;
   document.getElementById('rs-jpy-g').style.display = c==='JPY'?'':'none';
@@ -1039,43 +1053,95 @@ window.handleRsImg = function(e) {
   r.readAsDataURL(f);
 }
 
-window.saveRestock = async function() {
+window.addRestockItem = function() {
   const model = document.getElementById('rs-model').value.trim();
   const po = document.getElementById('rs-po').value.trim();
   const qty = parseInt(document.getElementById('rs-qty').value)||0;
   const missingRs = [];
   if (!model) missingRs.push('Model สินค้า');
   if (!po) missingRs.push('เลขที่ PO');
-  if (qty<=0) missingRs.push('จำนวนที่เติม');
+  if (qty<=0) missingRs.push('จำนวน');
   if (missingRs.length) { toast('❌ กรุณากรอก: ' + missingRs.join(', '), 'var(--red)'); return; }
   const cur = document.getElementById('rs-cur').value;
   const jpy = parseFloat(document.getElementById('rs-jpy').value)||0;
   const thb = parseFloat(document.getElementById('rs-thb').value)||0;
   const min = parseInt(document.getElementById('rs-min').value)||1;
   const cost = calcCostThb({currency:cur,priceJpy:jpy,priceThb:thb});
+  const usedFor = Array.from(document.querySelectorAll('#rs-usedfor-checks input:checked')).map(c=>c.value);
+  const date = document.getElementById('rs-date').value;
+  window.rsCart.push({ date, model, po, cur, jpy, thb, qty, min, cost, usedFor, img: window.rsImgData||'' });
+  renderRsCart();
+  // ล้างช่อง model/ราคา/จำนวน แต่คง date และ PO ไว้
+  ['rs-model','rs-jpy','rs-thb','rs-qty','rs-cost','rs-sell'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
+  document.getElementById('rs-min').value='1';
+  document.getElementById('rs-cur').value='JPY';
+  document.getElementById('rs-jpy-g').style.display='';
+  document.getElementById('rs-thb-g').style.display='none';
+  document.getElementById('rs-img-prev').innerHTML='📷<br><span style="font-size:12px;color:var(--text2)">คลิกเพื่อแนบรูป / ถ่ายรูปจากกล้อง</span>';
+  document.querySelectorAll('#rs-usedfor-checks input').forEach(c=>c.checked=false);
+  window.rsImgData='';
+  toast('✅ เพิ่ม '+model+' ลงรายการแล้ว');
+}
 
-  // หา/สร้าง stock
-  const existing = window.localData.stocks.find(s=>s.model===model&&s.po===po);
-  const rsUsedForUpd = Array.from(document.querySelectorAll('#rs-usedfor-checks input:checked')).map(c=>c.value);
-  if (existing) {
-    await dbSet('stocks', existing.id, {
-      ...existing, qty: (existing.qty||0)+qty,
-      currency:cur, priceJpy:jpy, priceThb:thb, min,
-      usedFor: rsUsedForUpd.length ? rsUsedForUpd : (existing.usedFor||[]),
-      img: window.rsImgData||existing.img
-    });
-  } else {
-    await dbAdd('stocks', { model, po, currency:cur, priceJpy:jpy, priceThb:thb, qty, min, usedFor:rsUsedForUpd, img:window.rsImgData });
+window.renderRsCart = function() {
+  const cart = window.rsCart;
+  document.getElementById('rs-cart-count').textContent = cart.length;
+  document.getElementById('rs-confirm-btn').style.display = cart.length > 0 ? '' : 'none';
+  if (!cart.length) {
+    document.getElementById('rs-cart').innerHTML = '<div class="empty">ยังไม่มีรายการ</div>';
+    return;
   }
+  let html = '';
+  cart.forEach((item, idx) => {
+    const priceStr = item.cur==='JPY' ? '¥'+fmt(item.jpy) : '฿'+fmt(item.thb);
+    const usedStr = item.usedFor&&item.usedFor.length ? item.usedFor.join(', ') : '—';
+    html += `<div class="cart-row" style="margin-bottom:8px">
+      <div class="flex gap8" style="flex-wrap:wrap;align-items:center">
+        ${item.img ? `<img src="${item.img}" style="width:36px;height:36px;object-fit:cover;border-radius:5px;border:1px solid var(--border)">` : ''}
+        <div style="flex:1;min-width:0">
+          <div class="bold" style="font-size:13px">${item.model}</div>
+          <div style="font-size:11px;color:var(--text2)">${item.po} · ${item.cur} ${priceStr} · ${item.qty} ชิ้น · ต้นทุน ฿${fmtD(item.cost)}</div>
+          <div style="font-size:11px;color:var(--text3)">ใช้สำหรับ: ${usedStr}</div>
+        </div>
+        <button class="btn btn-danger btn-sm btn-icon" onclick="removeRsCartItem(${idx})">🗑️</button>
+      </div>
+    </div>`;
+  });
+  document.getElementById('rs-cart').innerHTML = html;
+}
 
-  const rsUsedFor = Array.from(document.querySelectorAll('#rs-usedfor-checks input:checked')).map(c=>c.value);
-  // บันทึก log
-  await dbAdd('restockLog', { date:document.getElementById('rs-date').value, model, po, currency:cur, jpy, thb, qty, costThb:cost, usedFor:rsUsedFor });
-  clearRestock(); toast('✅ เติมสินค้า '+qty+' ชิ้นแล้ว');
+window.removeRsCartItem = function(idx) {
+  window.rsCart.splice(idx, 1);
+  renderRsCart();
+}
+
+window.saveRestock = async function() {
+  if (!window.rsCart.length) { toast('❌ ยังไม่มีรายการ', 'var(--red)'); return; }
+  let totalItems = 0;
+  for (const item of window.rsCart) {
+    const existing = window.localData.stocks.find(s=>s.model===item.model&&s.po===item.po);
+    if (existing) {
+      await dbSet('stocks', existing.id, {
+        ...existing, qty: (existing.qty||0)+item.qty,
+        currency:item.cur, priceJpy:item.jpy, priceThb:item.thb, min:item.min,
+        usedFor: item.usedFor.length ? item.usedFor : (existing.usedFor||[]),
+        img: item.img||existing.img
+      });
+    } else {
+      await dbAdd('stocks', { model:item.model, po:item.po, currency:item.cur, priceJpy:item.jpy, priceThb:item.thb, qty:item.qty, min:item.min, usedFor:item.usedFor, img:item.img });
+    }
+    await dbAdd('restockLog', { date:item.date, model:item.model, po:item.po, currency:item.cur, jpy:item.jpy, thb:item.thb, qty:item.qty, costThb:item.cost, usedFor:item.usedFor });
+    totalItems += item.qty;
+  }
+  const n = window.rsCart.length;
+  clearRestock();
+  toast(`✅ เติมสินค้า ${n} รายการ (${totalItems} ชิ้น) แล้ว`);
   if (!window.isFirebase) { renderStock(); renderDashboard(); renderRestockLog(); updateModelDL(); updateBadge(); }
 }
 
 window.clearRestock = function() {
+  window.rsCart = [];
+  renderRsCart();
   ['rs-model','rs-po','rs-jpy','rs-thb','rs-qty','rs-cost','rs-sell'].forEach(id=>{ const el=document.getElementById(id); if(el) el.value=''; });
   document.getElementById('rs-min').value='1';
   document.getElementById('rs-cur').value='JPY';
@@ -1091,11 +1157,13 @@ window.renderRestockLog = function() {
   const logs = window.localData.restockLog.slice(0,20);
   let html = '';
   logs.forEach(r => {
+    const usedStr = r.usedFor&&r.usedFor.length ? r.usedFor.join(', ') : '—';
     html += `<tr><td>${r.date||''}</td><td>${r.model||''}</td><td class="mono t2" style="font-size:11px">${r.po||''}</td>
     <td>${r.currency||''}</td><td class="mono">${r.currency==='JPY'?'¥'+fmt(r.jpy):'฿'+fmt(r.thb)}</td>
-    <td class="mono">${r.qty||0}</td><td class="mono ta">฿${fmtD(r.costThb||0)}</td></tr>`;
+    <td class="mono">${r.qty||0}</td><td class="mono ta">฿${fmtD(r.costThb||0)}</td>
+    <td style="font-size:11px;color:var(--text2)">${usedStr}</td></tr>`;
   });
-  document.getElementById('restock-log').innerHTML = html || '<tr><td colspan="7" class="empty">ยังไม่มีประวัติ</td></tr>';
+  document.getElementById('restock-log').innerHTML = html || '<tr><td colspan="8" class="empty">ยังไม่มีประวัติ</td></tr>';
 }
 
 // ============ WITHDRAW ============
@@ -1408,6 +1476,7 @@ window.showPage = function(id, btn) {
   if (btn) btn.classList.add('active');
   document.getElementById('page-title').textContent = PAGE_TITLES[id]||id;
   if (id==='withdraw') { renderCart(); updateCustDL(); initDates(); }
+  if (id==='restock') { renderRsCart(); renderRestockLog(); initDates(); }
   if (id==='stock') renderStock();
   if (id==='history') renderHistory();
   if (id==='customers') renderCustomers();
