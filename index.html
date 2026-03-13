@@ -207,6 +207,12 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
       <b>3.</b> วาง config ในช่องด้านล่างแล้วกด Save<br>
       รูปแบบ: <code>{ apiKey: "...", authDomain: "...", projectId: "..." }</code>
     </div>
+    <div class="setup-step" style="border-left-color:var(--yellow)">
+      <b>⚠️ ใช้งานบน GitHub Pages?</b><br>
+      ต้องเพิ่ม domain ใน Firebase Console ก่อน:<br>
+      Authentication → <b>Settings → Authorized domains</b><br>
+      → Add domain: <code>ชื่อuser.github.io</code>
+    </div>
     <div class="fg">
       <label>Firebase Config (JSON)</label>
       <textarea id="fb-config-input" rows="6" placeholder='{
@@ -653,39 +659,77 @@ function initFirebase(cfg) {
     document.getElementById('sync-label').textContent = 'Firebase Connected';
     document.getElementById('sync-dot').style.background = 'var(--green)';
     document.getElementById('fb-status-text').textContent = `เชื่อมต่อกับ Project: ${cfg.projectId}`;
+    localStorage.setItem('fb_config', JSON.stringify(cfg));
+    // ถ้า Firebase ไม่ตอบภายใน 8 วินาที → fallback Local
+    window._fbTimeout = setTimeout(() => {
+      if (window.localData.stocks.length === 0 && window.localData.history.length === 0) {
+        console.warn('Firebase timeout — switching to Local Mode');
+        window.isFirebase = false;
+        document.getElementById('sync-label').textContent = 'Local Mode (Firebase timeout)';
+        document.getElementById('sync-dot').style.background = 'var(--yellow)';
+        document.getElementById('fb-status-text').textContent = 'Firebase ไม่ตอบสนอง — ใช้ Local Mode';
+        loadLocal();
+        renderStock(); renderDashboard(); renderHistory(); renderCustomers(); renderRestockLog(); updateBadge();
+      }
+    }, 8000);
     subscribeFirebase();
     initUI();
   } catch(e) {
-    toast('เชื่อมต่อ Firebase ไม่สำเร็จ: ' + e.message, 'var(--red)');
+    console.error('Firebase init error:', e);
+    window.isFirebase = false;
+    loadLocal();
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('app').style.display = 'flex';
+    document.getElementById('sync-label').textContent = 'Local Mode';
+    document.getElementById('sync-dot').style.background = 'var(--yellow)';
+    document.getElementById('fb-status-text').textContent = 'Firebase เชื่อมไม่ได้ — ใช้ Local Mode';
+    initUI();
   }
 }
 
 // ============ FIREBASE REALTIME SUBSCRIBE ============
+function fallbackToLocal(reason) {
+  if (window._fbFallback) return;
+  window._fbFallback = true;
+  window.isFirebase = false;
+  clearTimeout(window._fbTimeout);
+  window.unsubscribers.forEach(u => { try { u(); } catch(e){} });
+  window.unsubscribers = [];
+  loadLocal();
+  document.getElementById('sync-label').textContent = 'Local Mode';
+  document.getElementById('sync-dot').style.background = 'var(--yellow)';
+  document.getElementById('fb-status-text').textContent = reason || 'Firebase ไม่ตอบสนอง — ใช้ Local Mode';
+  renderStock(); renderDashboard(); renderHistory(); renderCustomers(); renderRestockLog(); updateBadge();
+  console.warn('Fallback to local:', reason);
+}
+
 function subscribeFirebase() {
+  const onErr = (e) => fallbackToLocal('Firebase ถูก block หรือ domain ไม่ได้รับอนุญาต — ใช้ Local Mode');
   // Stocks
   const unsub1 = onSnapshot(collection(db, 'stocks'), snap => {
+    clearTimeout(window._fbTimeout);
     window.localData.stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderStock(); renderDashboard(); updateModelDL(); updateBadge();
-  });
+  }, onErr);
   // History
   const unsub2 = onSnapshot(query(collection(db, 'history'), orderBy('createdAt', 'desc')), snap => {
     window.localData.history = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderHistory(); renderDashboard();
-  });
+  }, onErr);
   // Customers
   const unsub3 = onSnapshot(collection(db, 'customers'), snap => {
     window.localData.customers = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderCustomers(); updateCustDL();
-  });
+  }, onErr);
   // Restock Log
   const unsub4 = onSnapshot(query(collection(db, 'restockLog'), orderBy('createdAt', 'desc')), snap => {
     window.localData.restockLog = snap.docs.map(d => ({ id: d.id, ...d.data() }));
     renderRestockLog();
-  });
+  }, onErr);
   // Settings
   const unsub5 = onSnapshot(doc(db, 'config', 'settings'), snap => {
     if (snap.exists()) { window.localData.settings = snap.data(); loadSettingsUI(); }
-  });
+  }, onErr);
   window.unsubscribers = [unsub1, unsub2, unsub3, unsub4, unsub5];
 }
 
