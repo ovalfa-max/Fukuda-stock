@@ -191,8 +191,14 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 <body>
 
 <!-- FIREBASE SETUP SCREEN -->
-<div class="setup-screen" id="setup-screen">
+<div class="setup-screen" id="setup-screen" style="display:none">
   <div class="setup-box">
+    <div id="connecting-msg" style="text-align:center;padding:32px 0;display:none">
+      <div style="font-size:32px;margin-bottom:12px">⏳</div>
+      <div style="font-size:17px;font-weight:600;color:var(--accent)">กำลังเชื่อมต่อ Firebase...</div>
+      <div style="font-size:13px;color:var(--text2);margin-top:8px">กรุณารอสักครู่</div>
+    </div>
+    <div id="setup-form-content">
     <div class="setup-title">⚙️ ตั้งค่า Firebase</div>
     <div class="setup-sub">ทำครั้งเดียว จากนั้นทุกเครื่องจะ Sync กันอัตโนมัติ</div>
     <div class="setup-step">
@@ -222,6 +228,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
     <div style="margin-top:10px;text-align:center">
       <button class="btn btn-ghost btn-sm" onclick="useLocalMode()">ใช้งานแบบ Local (ไม่ sync)</button>
     </div>
+    </div><!-- end setup-form-content -->
   </div>
 </div>
 
@@ -610,19 +617,73 @@ window.showSetup = function() {
   document.getElementById('setup-screen').style.display = 'flex';
 }
 
+function showConnecting(show) {
+  const msg = document.getElementById('connecting-msg');
+  const form = document.getElementById('setup-form-content');
+  const screen = document.getElementById('setup-screen');
+  if (show) {
+    screen.style.display = 'flex';
+    msg.style.display = 'block';
+    form.style.display = 'none';
+  } else {
+    msg.style.display = 'none';
+    form.style.display = 'block';
+  }
+}
+
 function initFirebase(cfg) {
   try {
+    showConnecting(true);
     const app = initializeApp(cfg);
     window.db = getFirestore(app);
     window.isFirebase = true;
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('sync-label').textContent = 'Firebase Connected';
-    document.getElementById('sync-dot').style.background = 'var(--green)';
-    document.getElementById('fb-status-text').textContent = `เชื่อมต่อกับ Project: ${cfg.projectId}`;
-    subscribeFirebase();
-    initUI();
+
+    // Test connection with timeout
+    let connected = false;
+    const timeout = setTimeout(() => {
+      if (!connected) {
+        // Timeout — fallback to local mode
+        window.isFirebase = false;
+        window.db = null;
+        showConnecting(false);
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        document.getElementById('sync-label').textContent = 'Firebase Timeout';
+        document.getElementById('sync-dot').style.background = 'var(--yellow)';
+        document.getElementById('fb-status-text').textContent = 'Firebase ไม่ตอบสนอง — ใช้ Local Mode';
+        loadLocal();
+        initUI();
+        toast('Firebase ไม่ตอบสนอง — สลับเป็น Local Mode', 'var(--yellow)');
+      }
+    }, 8000);
+
+    // Subscribe and mark connected on first snapshot
+    const unsub = onSnapshot(collection(app ? window.db : db, 'stocks'), () => {
+      if (!connected) {
+        connected = true;
+        clearTimeout(timeout);
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('app').style.display = 'flex';
+        document.getElementById('sync-label').textContent = 'Firebase Connected';
+        document.getElementById('sync-dot').style.background = 'var(--green)';
+        document.getElementById('fb-status-text').textContent = `เชื่อมต่อกับ Project: ${cfg.projectId}`;
+        unsub();
+        subscribeFirebase();
+        initUI();
+      }
+    }, (err) => {
+      connected = true;
+      clearTimeout(timeout);
+      showConnecting(false);
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      window.isFirebase = false;
+      loadLocal();
+      initUI();
+      toast('Firebase error: ' + err.message + ' — ใช้ Local Mode', 'var(--red)');
+    });
   } catch(e) {
+    showConnecting(false);
     toast('เชื่อมต่อ Firebase ไม่สำเร็จ: ' + e.message, 'var(--red)');
   }
 }
@@ -1485,6 +1546,7 @@ const FIREBASE_CONFIG = {
 window.sortState = { stock: { key:'', dir:1 }, history: { key:'', dir:1 }, customers: { key:'', dir:1 } };
 window.stockOrder = null;
 
+// Auto-connect on load
 initFirebase(FIREBASE_CONFIG);
 
 window.sortTable = function(table, key, th) {
