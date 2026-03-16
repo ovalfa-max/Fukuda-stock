@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+<!-- FUKUDA Stock v4.1 REST-API build -->
 <html lang="th">
 <head>
 <meta charset="UTF-8">
@@ -10,11 +11,8 @@
 <link rel="manifest" href="manifest.json">
 <title>FUKUDA Stock</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-<!-- Firebase SDK (compat) — loaded as regular scripts for maximum compatibility -->
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 <script>
-// Signal: compat scripts loaded — prevent safety fallback from firing
+// Signal: prevent safety fallback timer from firing
 window._moduleLoaded = true;
 window._compatSDKLoaded = true;
 </script>
@@ -361,7 +359,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
       if (typeof window.renderActivity === 'function') window.renderActivity();
       if (typeof window.renderCustomers === 'function') window.renderCustomers();
       if (typeof window.updateBadge === 'function') window.updateBadge();
-      if (typeof window.initUI === 'function') window.initUI();
+      if (typeof window.initUI === 'function' && !window._uiInitialized) window.initUI();
     }
   }, 12000);
 })();
@@ -370,7 +368,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 <body>
 
 <!-- FIREBASE SETUP SCREEN -->
-<div class="setup-screen" id="setup-screen">
+<div class="setup-screen" id="setup-screen" style="display:none">
   <div class="setup-box">
     <div class="setup-title">⚙️ ตั้งค่า Firebase</div>
     <div class="setup-sub">ทำครั้งเดียว จากนั้นทุกเครื่องจะ Sync กันอัตโนมัติ</div>
@@ -414,7 +412,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 </div>
 
 <!-- APP -->
-<div class="app" id="app" style="display:none">
+<div class="app" id="app" style="display:flex">
   <!-- SIDEBAR -->
   <div class="sidebar" id="sidebar">
     <div class="logo-wrap">
@@ -453,9 +451,9 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
   <div class="main">
     <div class="topbar">
       <div class="page-title" id="page-title">📊 Dashboard</div>
-      <div class="sync-badge" id="sync-badge">
+      <div class="sync-badge" id="sync-badge" onclick="showFirebaseDebug()" style="cursor:pointer" title="คลิกเพื่อดู status">
         <span class="sync-dot" id="sync-dot"></span>
-        <span id="sync-label">Syncing...</span>
+        <span id="sync-label">กำลังโหลด...</span>
       </div>
       <div style="font-size:11px;color:var(--text3);font-family:var(--mono)" id="clock"></div>
     </div>
@@ -663,8 +661,8 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
             <div class="fg"><label>ลูกค้า</label><input type="text" id="wd-cust" list="cust-dl" placeholder="ค้นหาลูกค้า..."><datalist id="cust-dl"></datalist></div>
             <div class="fg"><label>สถานะ PO</label>
               <select id="wd-po">
+                <option value="has_po">✅ มี PO แล้ว</option>
                 <option value="no_po">⏳ ยังไม่มี PO</option>
-                <option value="has_po">✅ ได้รับ PO แล้ว</option>
               </select>
             </div>
             <div class="fg"><label>หมายเหตุ</label><textarea id="wd-remark" rows="2"></textarea></div>
@@ -837,7 +835,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
                     <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260 Thailand</div>
                     <div class="sr-company-info">818/50 เดอะมาสเตอร์อุดมสุข ถนนอุดมสุข แขวงบางนาเหนือ เขตบางนา กรุงเทพฯ 10260</div>
                     <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615 เลขประจำตัวผู้เสียภาษี 0 1055 49142 05 7</div>
-                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                    <div class="sr-company-info">Email : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="014f60736075696871416e77606d756960686d606f652f626e6c">[email&#160;protected]</a></div>
                   </td>
                   <td colspan="4" class="sr-title-cell">SERVICE REPORT</td>
                   <td class="sr-c1"></td>
@@ -1075,7 +1073,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
                     <div class="sr-company-sub">บริษัท โอวัล(ไทยแลนด์) จำกัด</div>
                     <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260</div>
                     <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615</div>
-                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                    <div class="sr-company-info">Email : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="d09eb1a2b1a4b8b9a090bfa6b1bca4b8b1b9bcb1beb4feb3bfbd">[email&#160;protected]</a></div>
                   </td>
                   <td colspan="4" class="sr-title-cell">SERVICE REPORT</td>
                   <td class="sr-c1"></td>
@@ -1210,7 +1208,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
                     <div class="sr-company-sub">บริษัท โอวัล(ไทยแลนด์) จำกัด</div>
                     <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260</div>
                     <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615</div>
-                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                    <div class="sr-company-info">Email : <a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="a1efc0d3c0d5c9c8d1e1ced7c0cdd5c9c0c8cdc0cfc58fc2cecc">[email&#160;protected]</a></div>
                   </td>
                   <td colspan="4" class="sr-title-cell">REPAIR REPORT</td>
                   <td class="sr-c1"></td>
@@ -1627,61 +1625,171 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 <!-- Firebase SDK -->
 
 <script>
-// Firebase SDK (compat) loaded via <script> tags in <head>
-let initializeApp, getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy;
+// Firebase Firestore REST API — no external SDK needed, works from file://
+// Project: stock-fukuda-49b0d
+let _fbProjectId = '';
+let _fbApiKey    = '';
+let _fbBaseUrl   = '';
 let _firebaseLoaded = false;
+let _pollIntervals = [];
+
+function _fsUrl(path) {
+  return _fbBaseUrl + path + '?key=' + _fbApiKey;
+}
+
+// Convert Firestore REST value → JS value
+function _fromFsVal(v) {
+  if (!v) return null;
+  if (v.stringValue  !== undefined) return v.stringValue;
+  if (v.integerValue !== undefined) return parseInt(v.integerValue);
+  if (v.doubleValue  !== undefined) return parseFloat(v.doubleValue);
+  if (v.booleanValue !== undefined) return v.booleanValue;
+  if (v.nullValue    !== undefined) return null;
+  if (v.timestampValue !== undefined) return new Date(v.timestampValue).getTime();
+  if (v.arrayValue) return (v.arrayValue.values || []).map(_fromFsVal);
+  if (v.mapValue)   return _fromFsFields(v.mapValue.fields || {});
+  return null;
+}
+function _fromFsFields(fields) {
+  const out = {};
+  for (const k in fields) out[k] = _fromFsVal(fields[k]);
+  return out;
+}
+
+// Convert JS value → Firestore REST value
+function _toFsVal(v) {
+  if (v === null || v === undefined) return {nullValue: null};
+  if (typeof v === 'boolean') return {booleanValue: v};
+  if (typeof v === 'number') {
+    if (Number.isInteger(v)) return {integerValue: String(v)};
+    return {doubleValue: v};
+  }
+  if (typeof v === 'string') return {stringValue: v};
+  if (Array.isArray(v)) return {arrayValue: {values: v.map(_toFsVal)}};
+  if (typeof v === 'object') return {mapValue: {fields: _toFsFields(v)}};
+  return {stringValue: String(v)};
+}
+function _toFsFields(obj) {
+  const out = {};
+  for (const k in obj) if (obj[k] !== undefined) out[k] = _toFsVal(obj[k]);
+  return out;
+}
+
+// Parse REST document → {id, data()}
+function _parseDoc(doc) {
+  const id = doc.name ? doc.name.split('/').pop() : '';
+  const data = _fromFsFields(doc.fields || {});
+  return { id, data: () => data };
+}
+
+// ── REST CRUD helpers ─────────────────────────────────────
+async function _fsGet(path) {
+  const r = await fetch(_fsUrl(path)); 
+  if (!r.ok) throw new Error('GET ' + path + ' → ' + r.status);
+  return r.json();
+}
+async function _fsList(colPath, orderField, orderDir) {
+  let url = _fbBaseUrl + colPath + '?key=' + _fbApiKey + '&pageSize=2000';
+  if (orderField) url += '&orderBy=' + encodeURIComponent(orderField + (orderDir === 'desc' ? ' desc' : ''));
+  const r = await fetch(url);
+  if (!r.ok) { if (r.status === 404) return []; throw new Error('LIST ' + colPath + ' → ' + r.status); }
+  const j = await r.json();
+  return (j.documents || []).map(_parseDoc);
+}
+async function _fsCreate(colPath, data) {
+  const r = await fetch(_fsUrl(colPath), {
+    method: 'POST',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({fields: _toFsFields(data)})
+  });
+  if (!r.ok) throw new Error('CREATE → ' + r.status + ' ' + await r.text());
+  const j = await r.json();
+  return j.name.split('/').pop();
+}
+async function _fsPatch(docPath, data, merge) {
+  let url = _fsUrl(docPath);
+  if (merge) {
+    const keys = Object.keys(data);
+    url += (url.includes('?') ? '&' : '?') + keys.map(k => 'updateMask.fieldPaths=' + encodeURIComponent(k)).join('&');
+  }
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: {'Content-Type': 'application/json'},
+    body: JSON.stringify({fields: _toFsFields(data)})
+  });
+  if (!r.ok) throw new Error('PATCH → ' + r.status + ' ' + await r.text());
+}
+async function _fsDelete(docPath) {
+  const r = await fetch(_fsUrl(docPath), {method: 'DELETE'});
+  if (!r.ok && r.status !== 404) throw new Error('DELETE → ' + r.status);
+}
+
+// ── Modular-style API (same interface as Firebase SDK) ────
+let collection, doc, getDocs, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy;
+
+function _setupRestAPI(projectId, apiKey) {
+  _fbProjectId = projectId;
+  _fbApiKey    = apiKey;
+  _fbBaseUrl   = 'https://firestore.googleapis.com/v1/projects/' + projectId + '/databases/(default)/documents/';
+  
+  const DB = '__rest__';
+  window.db = DB;
+
+  collection = (db, col)        => ({ _col: col, _type: 'col' });
+  doc        = (db, col, id)    => ({ _col: col, _id: id, _type: 'doc' });
+  getDocs    = async (ref)      => { const docs = await _fsList(ref._col, ref._order, ref._orderDir); return { docs }; };
+  addDoc     = async (ref, data)=> { const id = await _fsCreate(ref._col, data); return { id }; };
+  setDoc     = async (ref, data, opts) => {
+    if (ref._id) { await _fsPatch(ref._col + '/' + ref._id, data, opts && opts.merge); }
+    else          { await _fsCreate(ref._col, data); }
+  };
+  deleteDoc  = async (ref)      => { await _fsDelete(ref._col + '/' + ref._id); };
+
+  // query with orderBy: just attach metadata
+  query   = (ref, ...constraints) => {
+    constraints.forEach(c => { if (c && typeof c === 'function') c(ref); });
+    return ref;
+  };
+  orderBy = (field, dir) => (ref) => { ref._order = field; ref._orderDir = dir || 'asc'; return ref; };
+
+  // onSnapshot: poll every 4 seconds
+  onSnapshot = (ref, cb, errCb) => {
+    let lastJson = '';
+    const poll = async () => {
+      try {
+        let docs;
+        if (ref._type === 'col') {
+          docs = await _fsList(ref._col, ref._order, ref._orderDir);
+          const json = JSON.stringify(docs.map(d => ({id:d.id, data:d.data()})));
+          if (json !== lastJson) { lastJson = json; cb({ docs }); }
+        } else {
+          // single doc (config/settings)
+          try {
+            const j = await _fsGet(ref._col + '/' + ref._id);
+            const d = _parseDoc(j);
+            const json = JSON.stringify(d.data());
+            if (json !== lastJson) { lastJson = json; cb({ exists: () => true, data: () => d.data(), id: d.id }); }
+          } catch(e) {
+            if (e.message.includes('404')) cb({ exists: () => false, data: () => null });
+          }
+        }
+      } catch(e) { if (errCb) errCb(e); }
+    };
+    poll(); // immediate first fetch
+    const iv = setInterval(poll, 4000);
+    _pollIntervals.push(iv);
+    return () => clearInterval(iv); // unsubscribe fn
+  };
+}
 
 function loadFirebaseSDK() {
   return new Promise((resolve) => {
-    const MAX = 80, INTERVAL = 100;
-    let tries = 0;
-    const check = () => {
-      tries++;
-      if (window.firebase && window.firebase.firestore) {
-        _mapFirebaseCompat();
-        _firebaseLoaded = true;
-        resolve(true);
-      } else if (tries >= MAX) {
-        console.warn('[Firebase] SDK not available after timeout');
-        resolve(false);
-      } else {
-        setTimeout(check, INTERVAL);
-      }
-    };
-    check();
+    // REST API is always available — no external scripts needed
+    _firebaseLoaded = true;
+    resolve(true);
   });
 }
 
-function _mapFirebaseCompat() {
-  const fb = window.firebase;
-  initializeApp = (cfg) => {
-    try { const ex = fb.app(); ex.delete().catch(()=>{}); } catch(e) {}
-    return fb.initializeApp(cfg);
-  };
-  getFirestore = (_app) => fb.firestore();
-  collection = (db, colName) => db.collection(colName);
-  doc        = (db, colName, docId) => db.collection(colName).doc(docId);
-  getDocs    = (ref) => ref.get().then(snap => ({
-    docs: snap.docs
-      ? snap.docs.map(d => ({ id: d.id, data: () => d.data() }))
-      : [{ id: snap.id, data: () => snap.data() }]
-  }));
-  addDoc     = (ref, data) => ref.add(data).then(r => ({ id: r.id }));
-  setDoc     = (ref, data, opts) => ref.set(data, opts && opts.merge ? { merge: true } : {});
-  deleteDoc  = (ref) => ref.delete();
-  onSnapshot = (ref, cb, errCb) => ref.onSnapshot(
-    (snap) => {
-      if (typeof snap.docs !== 'undefined') {
-        cb({ docs: snap.docs.map(d => ({ id: d.id, data: () => d.data() })) });
-      } else {
-        cb({ exists: () => snap.exists, data: () => snap.data(), id: snap.id, docs: undefined });
-      }
-    },
-    errCb || ((e) => console.warn('[onSnapshot]', e))
-  );
-  query   = (ref, ...constraints) => { let q = ref; for (const c of constraints) { if (typeof c === 'function') q = c(q); } return q; };
-  orderBy = (field, dir) => (ref) => ref.orderBy(field, dir || 'asc');
-}
 
 // ============ STATE ======
 // Signal to non-module scripts that module loaded OK
@@ -1696,6 +1804,16 @@ window.wdCart = [];
 window.rsImgData = '';
 window.msImgData = '';
 window.unsubscribers = [];
+
+// ── Boot immediately with local data ──────────────────────
+// App div is visible by default. Load local data and render right away.
+// Firebase will sync in background when ready.
+document.addEventListener('DOMContentLoaded', function() {
+  loadLocal();
+  initUI();
+  document.getElementById('sync-label').textContent = '⏳ กำลังเชื่อมต่อ Firebase...';
+  document.getElementById('sync-dot').style.background = 'var(--yellow)';
+});
 
 // ============ FIREBASE INIT ============
 window.saveFirebaseConfig = function() {
@@ -1718,7 +1836,41 @@ window.useLocalMode = function() {
   document.getElementById('sync-dot').style.background = 'var(--yellow)';
   document.getElementById('fb-status-text').textContent = 'ใช้งานแบบ Local (ไม่ sync)';
   toast('ℹ️ ใช้งานแบบ Local Mode (ไม่ sync กับ Firebase)', 'info');
-  initUI();
+  if (!window._uiInitialized) initUI();;
+}
+
+window.showFirebaseDebug = async function() {
+  var lines = [
+    '=== Firebase Debug v3.2 ===',
+    'isFirebase: ' + window.isFirebase,
+    'db: ' + (window.db || 'null'),
+    '_fbBaseUrl: ' + (_fbBaseUrl ? 'SET ✓' : 'NOT SET ✗'),
+    '_firebaseLoaded: ' + _firebaseLoaded,
+    'stocks loaded: ' + (window.localData ? window.localData.stocks.length : 'n/a'),
+    'projectId: ' + (typeof FIREBASE_CONFIG !== 'undefined' ? FIREBASE_CONFIG.projectId : 'undefined'),
+    'readyState: ' + document.readyState,
+  ];
+  // Test fetch to Firestore REST API
+  if (_fbBaseUrl) {
+    try {
+      var testUrl = _fbBaseUrl + 'stocks?key=' + _fbApiKey + '&pageSize=1';
+      lines.push('Testing: ' + testUrl.substring(0,60) + '...');
+      var r = await fetch(testUrl);
+      lines.push('Fetch status: ' + r.status + ' ' + r.statusText);
+      if (r.ok) {
+        var j = await r.json();
+        lines.push('Documents: ' + (j.documents ? j.documents.length : 0));
+      } else {
+        var txt = await r.text();
+        lines.push('Error: ' + txt.substring(0, 100));
+      }
+    } catch(e) {
+      lines.push('Fetch ERROR: ' + e.message);
+    }
+  } else {
+    lines.push('_fbBaseUrl not set yet - REST API not initialized');
+  }
+  alert(lines.join('\n'));
 }
 
 window.showSetup = function() {
@@ -1753,65 +1905,33 @@ window.checkFirebaseConnection = async function() {
 }
 
 function initFirebase(cfg) {
-  // Load Firebase SDK dynamically, fallback to local if fails
-  loadFirebaseSDK().then(function(loaded) {
-    if (!loaded) {
-      console.warn('[initFirebase] Firebase SDK โหลดไม่ได้ → Local Mode');
-      window.isFirebase = false;
-      loadLocal();
-      document.getElementById('setup-screen').style.display = 'none';
-      document.getElementById('app').style.display = 'flex';
-      document.getElementById('sync-label').textContent = 'Local Mode';
-      document.getElementById('sync-dot').style.background = 'var(--yellow)';
-      document.getElementById('fb-status-text').textContent = 'ไม่มีอินเทอร์เน็ต — ใช้ข้อมูล Local';
-      toast('⚠️ ไม่สามารถโหลด Firebase SDK — ใช้ Local Mode', 'warning', 5000);
-      initUI();
-      return;
-    }
-    _initFirebaseInner(cfg);
-  });
+  // REST API mode: call directly, no async SDK loading needed
+  _initFirebaseInner(cfg);
 }
 
 function _initFirebaseInner(cfg) {
-  // Show app immediately — don't block UI waiting for Firebase
-  loadLocal();
-  document.getElementById('setup-screen').style.display = 'none';
-  document.getElementById('app').style.display = 'flex';
-  document.getElementById('sync-label').textContent = '⏳ กำลังเชื่อมต่อ...';
-  document.getElementById('sync-dot').style.background = 'var(--yellow)';
-  initUI();
-
-  // Connect Firebase in background
+  // Use REST API — no SDK needed, works from file://
+  // If DOM not ready yet, wait for it
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { _initFirebaseInner(cfg); });
+    return;
+  }
   try {
-    const app = initializeApp(cfg);
-    window.db = getFirestore(app);
+    _setupRestAPI(cfg.projectId, cfg.apiKey);
     window.isFirebase = true;
     localStorage.setItem('fb_config', JSON.stringify(cfg));
-    // Timeout: if no data in 10s → stay local
-    window._fbTimeout = setTimeout(() => {
-      if (window.localData.stocks.length === 0 && window.localData.history.length === 0) {
-        console.warn('Firebase timeout — switching to Local Mode');
-        window.isFirebase = false;
-        document.getElementById('sync-label').textContent = 'Local Mode';
-        document.getElementById('sync-dot').style.background = 'var(--yellow)';
-        document.getElementById('fb-status-text').textContent = 'Firebase ไม่ตอบสนอง — ใช้ Local Mode';
-        toast('⚠️ Firebase timeout — ใช้ข้อมูล Local แทน', 'warning');
-      }
-    }, 10000);
-    subscribeFirebase();
-    // subscribeFirebase will call renderStock() etc. when data arrives
-    // Update UI badge when connected
-    document.getElementById('sync-label').textContent = 'Firebase Connected';
-    document.getElementById('sync-dot').style.background = 'var(--green)';
+    document.getElementById('setup-screen').style.display = 'none';
+    document.getElementById('sync-label').textContent = '⏳ กำลังซิงค์...';
+    document.getElementById('sync-dot').style.background = 'var(--yellow)';
     document.getElementById('fb-status-text').textContent = 'เชื่อมต่อกับ Project: ' + cfg.projectId;
-    toast('✅ เชื่อมต่อ Firebase สำเร็จ — ' + cfg.projectId, 'info');
+    subscribeFirebase();
   } catch(e) {
     console.error('Firebase init error:', e);
     window.isFirebase = false;
     document.getElementById('sync-label').textContent = 'Local Mode';
     document.getElementById('sync-dot').style.background = 'var(--yellow)';
-    document.getElementById('fb-status-text').textContent = 'Firebase เชื่อมไม่ได้ — ใช้ Local Mode';
-    toast('❌ Firebase เชื่อมต่อไม่ได้ — ใช้ Local Mode', 'error');
+    document.getElementById('fb-status-text').textContent = 'REST API error — ใช้ Local Mode';
+    toast('❌ Firebase เชื่อมต่อไม่ได้: ' + e.message, 'error');
   }
 }
 
@@ -1821,6 +1941,8 @@ function fallbackToLocal(reason) {
   window._fbFallback = true;
   window.isFirebase = false;
   clearTimeout(window._fbTimeout);
+  _pollIntervals.forEach(iv => clearInterval(iv));
+  _pollIntervals = [];
   window.unsubscribers.forEach(u => { try { u(); } catch(e){} });
   window.unsubscribers = [];
   loadLocal();
@@ -1836,7 +1958,15 @@ function subscribeFirebase() {
   // Stocks
   const unsub1 = onSnapshot(collection(db, 'stocks'), snap => {
     clearTimeout(window._fbTimeout);
+    window._fbDataReceived = true;
     window.localData.stocks = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    // Update badge to show connected on first real data
+    var lbl = document.getElementById('sync-label');
+    var dot = document.getElementById('sync-dot');
+    if (lbl && (lbl.textContent.includes('กำลัง') || lbl.textContent.includes('Local'))) {
+      lbl.textContent = 'Firebase Connected';
+      if (dot) dot.style.background = 'var(--green)';
+    }
     renderStock(); renderDashboard(); updateModelDL(); updateBadge();
   }, onErr);
   // History
@@ -2079,7 +2209,7 @@ window.renderActivity = function() {
     qty:       h.qty    || 1,
     costThb:   (h.costThb || 0) * (h.qty || 1),
     sellThb:   (h.sellThb || 0) * (h.qty || 1),
-    poStatus:  h.poStatus || '',
+    poStatus:  h.poStatus || 'has_po',
     device:    h.device || '',
   }));
 
@@ -2529,37 +2659,22 @@ window.exportExcel = function(type) {
         ]);
       });
 
-      // Summary footer
-      const footerRow = [
-        `รวม ${stocks.length} รายการ`, '', '',
-        '', '',
-        '', '',
-        stocks.reduce((a,s)=>a+(s.qty||0),0), '',
-        '', '', '',
-        `✅${normal}  ⚠️${low}  ❌${out}`
-      ];
-
-      // Sheet rows (title=0, sub=1, spacer=2, hdr=3, data=4.., footer=last)
+      // No footer data row — summary info is in subtitle row (row 2)
+      // Sheet rows (title=0, sub=1, spacer=2, hdr=3, data=4+)
       const aoa = [
         Array(numCols).fill(''), // title (merge later)
         Array(numCols).fill(''), // sub
         Array(numCols).fill(''), // spacer
         headers,
         ...dataRows,
-        footerRow,
       ];
       const ws = XLSX.utils.aoa_to_sheet(aoa);
-
-      // Ref range
-      const lastRow = aoa.length - 1;
 
       // Merges
       ws['!merges'] = [
         {s:{r:0,c:0},e:{r:0,c:numCols-1}},
         {s:{r:1,c:0},e:{r:1,c:numCols-1}},
         {s:{r:2,c:0},e:{r:2,c:numCols-1}},
-        // footer first cell merge
-        {s:{r:lastRow,c:0},e:{r:lastRow,c:2}},
       ];
 
       // Row heights
@@ -2640,21 +2755,7 @@ window.exportExcel = function(type) {
         }
       }
 
-      // Footer / summary row
-      const fr = lastRow;
-      const footerStyle = {
-        font:{bold:true, sz:10, color:{rgb:C.white}, name:'Calibri'},
-        fill:{fgColor:{rgb:C.navyHdr}, patternType:'solid'},
-        alignment:{vertical:'center'},
-        border: {top:{style:'medium',color:{rgb:C.accentBlue}}, bottom:{style:'thin',color:{rgb:C.navyHdr2}}, left:border(C.navyHdr2), right:border(C.navyHdr2)}
-      };
-      for (let c=0;c<numCols;c++) {
-        const addr = XLSX.utils.encode_cell({r:fr,c});
-        if (!ws[addr]) ws[addr]={v:'',t:'s'};
-        ws[addr].s = {...footerStyle, alignment:{...footerStyle.alignment, horizontal: [7,12].includes(c)?'center':[3,4,5,6].includes(c)?'right':'left'}};
-        if (c===7) ws[addr].z = '#,##0';
-        if (c===12) { ws[addr].s = {...footerStyle, font:{...footerStyle.font, color:{rgb:C.teal}}, alignment:{horizontal:'center',vertical:'center'}}; }
-      }
+      // (Footer row removed — summary is in subtitle row only)
 
       XLSX.utils.book_append_sheet(wb, ws, '📦 Stock');
       filename = `FUKUDA_Stock_${new Date().toISOString().slice(0,10)}.xlsx`;
@@ -2688,29 +2789,20 @@ window.exportExcel = function(type) {
         h.poStatus // hidden
       ]);
 
-      const footerRow = [
-        'รวม','','','','','','', '',
-        totalQty, Math.round(totalCost), Math.round(totalSell),
-        `✅${hasPO}  ⏳${noPO}`, ''
-      ];
-
       const aoa = [
         Array(numCols).fill(''),
         Array(numCols).fill(''),
         Array(numCols).fill(''),
         headers,
         ...dataRows,
-        footerRow,
       ];
       const ws = XLSX.utils.aoa_to_sheet(aoa);
-      const lastRow = aoa.length - 1;
 
       ws['!merges'] = [
         {s:{r:0,c:0},e:{r:0,c:numCols-1}},
         {s:{r:1,c:0},e:{r:1,c:numCols-1}},
         {s:{r:2,c:0},e:{r:2,c:numCols-1}},
-        {s:{r:lastRow,c:0},e:{r:lastRow,c:7}},
-      ];
+              ];
 
       const rowH = [{hpt:36},{hpt:18},{hpt:4},{hpt:36}];
       for (let i=0;i<dataRows.length;i++) rowH.push({hpt:20});
@@ -2775,23 +2867,7 @@ window.exportExcel = function(type) {
         }
       }
 
-      // Footer row
-      const fr = lastRow;
-      const fStyle = {
-        font:{bold:true,sz:10,color:{rgb:C.white},name:'Calibri'},
-        fill:{fgColor:{rgb:C.navyHdr},patternType:'solid'},
-        alignment:{vertical:'center'},
-        border:{top:{style:'medium',color:{rgb:C.accentBlue}},bottom:border(C.navyHdr2),left:border(C.navyHdr2),right:border(C.navyHdr2)}
-      };
-      for (let c=0;c<numCols;c++) {
-        const addr = XLSX.utils.encode_cell({r:fr,c});
-        if (!ws[addr]) ws[addr]={v:'',t:'s'};
-        const alignH = [8,9,10].includes(c)?'right':c===11?'center':'left';
-        ws[addr].s = {...fStyle, alignment:{...fStyle.alignment,horizontal:alignH}};
-        if ([9,10].includes(c)) ws[addr].z = '#,##0';
-        if (c===10) ws[addr].s = {...fStyle, font:{...fStyle.font,color:{rgb:C.green}}, alignment:{horizontal:'right',vertical:'center'}};
-        if (c===11) ws[addr].s = {...fStyle, font:{...fStyle.font,color:{rgb:C.teal}}, alignment:{horizontal:'center',vertical:'center'}};
-      }
+            // (Footer row removed — summary is in subtitle row)
 
       XLSX.utils.book_append_sheet(wb, ws, '📋 History');
 
@@ -3174,7 +3250,14 @@ window.importStockFile = async function(e) {
     for (let i = headerRowIdx + 1; i < rows.length; i++) {
       const row = rows[i];
       const model = String(row[colIdx.model]||'').trim();
-      if (!model || model.startsWith('FUKUDA') || model.startsWith('วันที่')) continue;
+      // Skip empty, header, and summary rows
+      if (!model) continue;
+      if (model.startsWith('FUKUDA')) continue;
+      if (model.startsWith('วันที่')) continue;
+      if (model.startsWith('รวม')) continue;
+      if (/รายการ/.test(model)) continue;
+      if (/^\d+\s*รายการ/.test(model)) continue;
+      if (model === '#' || /^-+$/.test(model)) continue;
 
       const po  = colIdx.po >= 0 ? String(row[colIdx.po]||'').trim() : '';
       const cur = colIdx.currency >= 0 ? String(row[colIdx.currency]||'JPY').trim().toUpperCase() : 'JPY';
@@ -3221,6 +3304,7 @@ window.importStockFile = async function(e) {
 
 
 function initUI() {
+  window._uiInitialized = true;
   initDeviceIdentity();
   loadSettingsUI();
   updateBackupLabel();
@@ -3982,7 +4066,7 @@ window.clearWithdraw = function() {
     const el=document.getElementById(id); if(el) el.value='';
   });
   document.getElementById('wd-name').value='';
-  document.getElementById('wd-po').value='no_po';
+  document.getElementById('wd-po').value='has_po';
   document.getElementById('wd-results').innerHTML='';
   renderCart();
 }
@@ -4645,6 +4729,8 @@ window.importCustFile = async function(e) {
       const name = String(row[col.name]||'').trim();
       // ข้ามแถวว่าง หรือแถว # (ลำดับ)
       if (!name || name === '#' || /^\d+$/.test(name)) continue;
+      if (name.startsWith('รวม') || /รายการ/.test(name)) continue;
+      if (name.startsWith('รวม') || /รายการ/.test(name)) continue;
 
       const data = {
         name,
@@ -5621,21 +5707,14 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScanner
 })();
 
 
-try {
-  initFirebase(FIREBASE_CONFIG);
-} catch(e) {
-  console.error('[initFirebase top-level error]', e);
-  // Force show app in local mode
-  window.isFirebase = false;
-  var _app = document.getElementById('app');
-  var _setup = document.getElementById('setup-screen');
-  if (_app) _app.style.display = 'flex';
-  if (_setup) _setup.style.display = 'none';
-  if (typeof loadLocal === 'function') loadLocal();
-  if (typeof initUI === 'function') initUI();
-  var _lbl = document.getElementById('sync-label');
-  if (_lbl) _lbl.textContent = 'Local Mode (Error)';
-}
+// Auto-connect on page load
+window.addEventListener('load', function() {
+  try {
+    initFirebase(FIREBASE_CONFIG);
+  } catch(e) {
+    console.error('[initFirebase error]', e);
+  }
+});
 </script>
 
 <!-- SCANNER MODAL -->
@@ -5647,20 +5726,4 @@ try {
     </div>
     <div id="scanner-viewport"></div>
     <div class="scanner-result" id="scanner-result">เล็งกล้องไปที่ Barcode หรือ QR Code</div>
-    <div class="scanner-hint">รองรับ Barcode (1D) และ QR Code (2D)<br>ค่าที่ scan ได้จะใส่ในช่องค้นหาอัตโนมัติ</div>
-  </div>
-</div>
-
-<script>
-// Update setup status messages at intervals
-setTimeout(function() {
-  var el = document.getElementById('setup-status');
-  var app = document.getElementById('app');
-  if (el && app && app.style.display === 'none') {
-    el.textContent = '⏳ ยังคงรอ Firebase... (จะเปลี่ยนเป็น Local Mode อัตโนมัติ)';
-  }
-}, 3000);
-</script>
-
-</body>
-</html>
+    <div class="scanner-hint">รองรับ Barcode (1D) และ QR Code (2D)<br>ค่าที่ scan ได้จะใส่
