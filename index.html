@@ -173,6 +173,75 @@ tr:hover td{background:rgba(255,255,255,0.015)}
   .g4{grid-template-columns:1fr 1fr}
 }
 
+
+/* ═══════════════ SERVICE REPORT STYLES ═══════════════ */
+.sr-wrap { max-width: 1000px; margin: 0 auto; }
+.sr-tab { padding:7px 18px; border:none; background:var(--s2); color:var(--text2); cursor:pointer; font-size:12.5px; font-family:var(--sans); font-weight:600; border-radius:8px 8px 0 0; transition:all .15s; }
+.sr-tab:hover { background:var(--s3); color:var(--text); }
+.sr-tab-active { background:#fff; color:#1e3a5f; }
+.sr-tab-content { }
+.sr-toolbar { display:flex; gap:8px; flex-wrap:wrap; align-items:center; margin-bottom:10px; }
+
+/* Excel wrapper */
+.sr-excel-wrap { background:#fff; border:1px solid #9ca3af; overflow-x:auto; border-radius:3px; }
+.sr-tbl { width:100%; border-collapse:collapse; font-family:'Calibri','Arial',sans-serif; font-size:11.5px; color:#111; table-layout:fixed; min-width:900px; }
+.sr-tbl td { border:1px solid #d1d5db; padding:1px 4px; vertical-align:middle; background:#fff; height:22px; }
+.sr-c1 { width:14px; background:#f9fafb; border:1px solid #d1d5db; }
+
+/* Logo cell */
+.sr-logo-cell { vertical-align:top; padding:8px 10px; border:1px solid #d1d5db; }
+.sr-company-name { font-size:13px; font-weight:900; color:#1e40af; }
+.sr-company-sub { font-size:11px; font-weight:600; color:#1e3a5f; }
+.sr-company-info { font-size:9.5px; color:#374151; line-height:1.5; }
+
+/* Title cell */
+.sr-title-cell { text-align:center; font-size:16px; font-weight:900; color:#1e3a5f; vertical-align:middle; background:#dbeafe; border:1px solid #9ca3af; }
+
+/* Section headers */
+.sr-section-hdr { background:#1e3a5f; color:#fff; font-weight:700; font-size:11.5px; text-align:left; padding:3px 8px; letter-spacing:.5px; }
+.sr-section-hdr2 { background:#374151; color:#fff; font-weight:600; font-size:10.5px; text-align:center; padding:2px 4px; }
+.sr-remedial-hdr { background:#374151; color:#fff; font-weight:700; text-align:center; }
+.sr-results-hdr { background:#d1fae5; color:#065f46; font-weight:700; text-align:center; }
+
+/* Field labels */
+.sr-field-label { background:#eff6ff; color:#1e3a5f; font-weight:600; font-size:10.5px; }
+.sr-label-right { text-align:right; background:#eff6ff; color:#1e3a5f; font-size:10.5px; }
+.sr-bold { font-weight:700; }
+
+/* Column headers */
+.sr-col-hdr { background:#e5e7eb; color:#374151; font-weight:700; font-size:10px; text-align:center; border:1px solid #9ca3af; }
+
+/* Read-only cells (mirrors) */
+.sr-ro { background:#f9fafb; color:#374151; text-align:center; font-size:11px; }
+
+/* Engineer cell */
+.sr-engineer-cell { text-align:center; vertical-align:middle; border-left:2px solid #9ca3af; }
+
+/* Inputs inside table */
+.sr-inp { width:100%; border:none; outline:none; background:transparent; font-family:'Calibri','Arial',sans-serif; font-size:11.5px; color:#111; padding:0 2px; }
+.sr-inp:focus { background:#fffbeb; outline:1px solid #f59e0b; }
+.sr-inp-bold { font-weight:700; }
+.sr-inp-center { text-align:center; }
+.sr-inp-right { text-align:right; }
+
+/* Parts row */
+.sr-part-pass { background:#d1fae5; color:#065f46; font-weight:700; text-align:center; }
+.sr-part-fail { background:#fee2e2; color:#991b1b; font-weight:700; text-align:center; }
+.sr-part-no { background:#f3f4f6; color:#374151; text-align:center; font-weight:600; }
+
+/* List/report rows */
+.sr-list-row { background:var(--surface); border:1px solid var(--border); border-radius:8px; padding:10px 14px; margin-bottom:6px; cursor:pointer; transition:border-color .15s; display:flex; justify-content:space-between; align-items:center; }
+.sr-list-row:hover { border-color:var(--accent); }
+.sr-list-info { font-size:12.5px; }
+.sr-list-meta { font-size:11px; color:var(--text2); margin-top:2px; }
+
+/* PO popup */
+.po-popup { background:var(--surface); border:1px solid var(--border); border-radius:10px; padding:16px; min-width:280px; max-width:420px; }
+.po-popup-title { font-size:13px; font-weight:700; color:var(--accent); margin-bottom:10px; }
+.po-option { background:var(--s2); border:1px solid var(--border); border-radius:7px; padding:8px 12px; margin-bottom:6px; cursor:pointer; transition:all .15s; font-size:12px; }
+.po-option:hover { border-color:var(--accent); background:var(--s3); color:var(--accent); }
+.po-option .po-detail { font-size:11px; color:var(--text2); margin-top:2px; }
+
 /* SORT */
 .th-sort { cursor:pointer; user-select:none; white-space:nowrap; }
 .th-sort:hover { color:var(--accent); }
@@ -239,6 +308,47 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 .scanner-hint { font-size:12px; color:var(--text2); text-align:center; margin-top:10px; line-height:1.6; }
 .scanner-result { font-size:13px; color:var(--green); font-family:var(--mono); text-align:center; margin-top:8px; font-weight:600; min-height:20px; }
 </style>
+
+<!-- SAFETY: Auto-fallback if Firebase SDK fails to load -->
+<script>
+(function() {
+  // If app div is still hidden after 4s → Firebase SDK failed → force local mode
+  setTimeout(function() {
+    var app = document.getElementById('app');
+    var setupScr = document.getElementById('setup-screen');
+    // Skip if module loaded OK (Firebase SDK is just slow - it handles itself)
+    if (window._moduleLoaded) return;
+    if (app && app.style.display === 'none') {
+      console.warn('[Safety] App still hidden after 4s — forcing Local Mode');
+      var setupStatus = document.getElementById('setup-status');
+      if (setupStatus) setupStatus.textContent = '⚠️ Firebase โหลดไม่ได้ — กำลังเปลี่ยนเป็น Local Mode อัตโนมัติ...';
+      app.style.display = 'flex';
+      if (setupScr) setupScr.style.display = 'none';
+      // Try to initialize local data
+      try {
+        var d = localStorage.getItem('fukuda_data');
+        if (d && window.localData) {
+          window.localData = Object.assign(window.localData || {}, JSON.parse(d));
+        }
+      } catch(e) {}
+      // Update UI indicators
+      var lbl = document.getElementById('sync-label');
+      var dot = document.getElementById('sync-dot');
+      var fbst = document.getElementById('fb-status-text');
+      if (lbl) lbl.textContent = 'Local Mode (Firebase SDK ไม่โหลด)';
+      if (dot) dot.style.background = '#f59e0b';
+      if (fbst) fbst.textContent = 'Firebase SDK โหลดไม่ได้ — ทำงานแบบ Offline';
+      // Trigger renders if functions exist
+      if (typeof window.renderDashboard === 'function') window.renderDashboard();
+      if (typeof window.renderStock === 'function') window.renderStock();
+      if (typeof window.renderActivity === 'function') window.renderActivity();
+      if (typeof window.renderCustomers === 'function') window.renderCustomers();
+      if (typeof window.updateBadge === 'function') window.updateBadge();
+      if (typeof window.initUI === 'function') window.initUI();
+    }
+  }, 4000);
+})();
+</script>
 </head>
 <body>
 
@@ -247,6 +357,9 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
   <div class="setup-box">
     <div class="setup-title">⚙️ ตั้งค่า Firebase</div>
     <div class="setup-sub">ทำครั้งเดียว จากนั้นทุกเครื่องจะ Sync กันอัตโนมัติ</div>
+    <div id="setup-status" style="font-size:12px;color:var(--yellow);margin-bottom:10px;min-height:18px;text-align:center">
+      ⏳ กำลังเชื่อมต่อ Firebase... (หากใช้ไม่ได้ กด "ใช้งานแบบ Local" ด้านล่าง)
+    </div>
     <div class="setup-step">
       <b>1.</b> ไปที่ <b>console.firebase.google.com</b><br>
       สร้าง Project ใหม่ → เลือก <b>Firestore Database</b> → Start in test mode
@@ -278,7 +391,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
     </div>
     <button class="btn btn-primary fw" onclick="saveFirebaseConfig()">🚀 เชื่อมต่อ Firebase</button>
     <div style="margin-top:10px;text-align:center">
-      <button class="btn btn-ghost btn-sm" onclick="useLocalMode()">ใช้งานแบบ Local (ไม่ sync)</button>
+      <button class="btn btn-ghost" onclick="useLocalMode()" style="width:100%;margin-top:4px;border-color:var(--yellow);color:var(--yellow)">⚡ ใช้งานแบบ Local (ไม่ sync ข้ามเครื่อง)</button>
     </div>
   </div>
 </div>
@@ -309,6 +422,9 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
     </button>
     <button class="nav-btn" onclick="showPage('customers',this)" data-tip="ลูกค้า">
       <span>👥</span><span class="nav-label">ลูกค้า</span>
+    </button>
+    <button class="nav-btn" onclick="showPage('servicereport',this)" data-tip="Service Report">
+      <span>📋</span><span class="nav-label">Service Report</span>
     </button>
     <button class="nav-btn" onclick="showPage('settings',this)" data-tip="ตั้งค่า">
       <span>⚙️</span><span class="nav-label">ตั้งค่า</span>
@@ -663,6 +779,648 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
       </div>
 
       <!-- SETTINGS -->
+      <!-- ═══════════════ SERVICE REPORT PAGE ═══════════════ -->
+      <div class="page" id="page-servicereport">
+        <div class="sr-wrap">
+          <!-- TOOLBAR -->
+          <div class="sr-toolbar">
+            <button class="btn btn-primary" onclick="srNew()">➕ สร้าง Report ใหม่</button>
+            <button class="btn btn-ghost" onclick="srShowList()" id="sr-list-btn">📂 รายการทั้งหมด</button>
+            <button class="btn btn-success" onclick="srExportXLSX()">⬇️ Export Excel</button>
+            <label class="btn btn-ghost" style="cursor:pointer">📂 Import Excel<input type="file" accept=".xlsx,.xls" style="display:none" onchange="srImportXLSX(this)"></label>
+            <div class="ml-auto" style="font-size:12px;color:var(--text2)" id="sr-current-label"></div>
+          </div>
+
+          <!-- FORM VIEW -->
+          <div id="sr-form-wrap">
+
+            <!-- TAB SELECTOR -->
+            <div style="display:flex;gap:0;margin-bottom:0;border-bottom:2px solid #374151">
+              <button id="tab-report" class="sr-tab sr-tab-active" onclick="srSwitchTab('report')">📋 Report</button>
+              <button id="tab-pocost" class="sr-tab" onclick="srSwitchTab('pocost')">💰 PO Cost</button>
+              <button id="tab-afterrepair" class="sr-tab" onclick="srSwitchTab('afterrepair')">🔧 After Repair</button>
+            </div>
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!--  TAB 1: REPORT                                 -->
+            <!-- ══════════════════════════════════════════════ -->
+            <div id="sr-tab-report" class="sr-tab-content" style="display:block">
+              <div class="sr-excel-wrap">
+              <table class="sr-tbl">
+                <!-- ROW 1: spacer -->
+                <tr style="height:4px"><td colspan="18"></td></tr>
+
+                <!-- ROW 2-5: Logo + Company Info -->
+                <tr style="height:80px">
+                  <td class="sr-c1"></td>
+                  <td colspan="13" rowspan="4" class="sr-logo-cell">
+                    <div class="sr-company-name">OVAL(THAILAND) LTD.</div>
+                    <div class="sr-company-sub">บริษัท โอวัล(ไทยแลนด์) จำกัด</div>
+                    <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260 Thailand</div>
+                    <div class="sr-company-info">818/50 เดอะมาสเตอร์อุดมสุข ถนนอุดมสุข แขวงบางนาเหนือ เขตบางนา กรุงเทพฯ 10260</div>
+                    <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615 เลขประจำตัวผู้เสียภาษี 0 1055 49142 05 7</div>
+                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                  </td>
+                  <td colspan="4" class="sr-title-cell">SERVICE REPORT</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">Date :</td>
+                  <td colspan="2"><input type="date" id="sr-date" class="sr-inp sr-inp-bold sr-inp-center" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">No :</td>
+                  <td colspan="2"><input type="text" id="sr-no" class="sr-inp sr-inp-bold" placeholder="FKD-RP-26-XX" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:20px">
+                  <td class="sr-c1"></td>
+                  <td colspan="4"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- ROW 6: CUSTOMER INFORMATION header -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" class="sr-section-hdr">CUSTOMER INFORMATION</td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- COMPANY -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">COMPANY</td>
+                  <td colspan="7">
+                    <input type="text" id="sr-company" class="sr-inp sr-inp-bold sr-inp-center" placeholder="ชื่อบริษัทลูกค้า" list="sr-company-list" oninput="srAutofillCustomer()" onchange="srMarkDirty()">
+                    <datalist id="sr-company-list"></datalist>
+                  </td>
+                  <td colspan="3" class="sr-label-right sr-bold">MODEL :</td>
+                  <td colspan="5"><input type="text" id="sr-model" class="sr-inp sr-inp-bold sr-inp-center" placeholder="Model" list="sr-model-list" oninput="srCheckModelDuplicate()" onchange="srMarkDirty()">
+                    <datalist id="sr-model-list"></datalist>
+                  </td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- CONTACT PERSON -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">CONTACT PERSON</td>
+                  <td colspan="7"><input type="text" id="sr-contact" class="sr-inp sr-inp-bold sr-inp-center" placeholder="Mr./Ms. ชื่อผู้ติดต่อ" onchange="srMarkDirty()"></td>
+                  <td colspan="3" class="sr-label-right sr-bold">SERIAL :</td>
+                  <td colspan="5"><input type="text" id="sr-serial" class="sr-inp sr-inp-bold sr-inp-center" placeholder="Serial No." onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- DEPARTMENT + OTHER EQUIPMENT -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">DEPARTMENT</td>
+                  <td colspan="7"><input type="text" id="sr-dept" class="sr-inp sr-inp-bold sr-inp-center" placeholder="แผนก" onchange="srMarkDirty()"></td>
+                  <td colspan="4" class="sr-label-right" style="font-size:10px">OTHER EQUIPMENT :</td>
+                  <td colspan="2"><input type="text" id="sr-eq1qty" class="sr-inp sr-inp-bold sr-inp-center" placeholder="2" onchange="srMarkDirty()"></td>
+                  <td><input type="text" id="sr-eq1unit" class="sr-inp sr-inp-bold" placeholder="Pcs." onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- E-MAIL -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">E-MAIL</td>
+                  <td colspan="7"><input type="text" id="sr-email" class="sr-inp sr-inp-center" placeholder="-" onchange="srMarkDirty()"></td>
+                  <td colspan="3" class="sr-label-right"></td>
+                  <td colspan="2"><input type="text" id="sr-eq2qty" class="sr-inp sr-inp-bold sr-inp-center" placeholder="2" onchange="srMarkDirty()"></td>
+                  <td><input type="text" id="sr-eq2unit" class="sr-inp sr-inp-bold" placeholder="Pcs." onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- MOBILE -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">MOBILE</td>
+                  <td colspan="7"><input type="text" id="sr-mobile" class="sr-inp sr-inp-bold sr-inp-center" placeholder="-" onchange="srMarkDirty()"></td>
+                  <td colspan="3" class="sr-label-right"></td>
+                  <td colspan="2"><input type="text" id="sr-eq3qty" class="sr-inp sr-inp-bold sr-inp-center" placeholder="1" onchange="srMarkDirty()"></td>
+                  <td><input type="text" id="sr-eq3unit" class="sr-inp sr-inp-bold" placeholder="Set" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- Spacer row 13 -->
+                <tr style="height:6px"><td colspan="18"></td></tr>
+
+                <!-- PROBLEM INFORMED section header -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" class="sr-section-hdr">PROBLEM INFORMED</td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- Problem rows 15-20 (free text lines) -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob1" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob2" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob3" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob4" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob5" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-prob6" class="sr-inp" placeholder="" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- PROBLEMS label + equipment name -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label sr-bold">PROBLEMS</td>
+                  <td colspan="6"><input type="text" id="sr-problem-eq" class="sr-inp sr-inp-bold sr-inp-center" placeholder="ชื่ออุปกรณ์ เช่น Air leak tester" onchange="srMarkDirty()"></td>
+                  <td colspan="9"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- INDICATIONS OF EQUIPMENT FAILURE -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="5" class="sr-field-label" style="font-size:9.5px">INDICATIONS OF EQUIPMENT FAILURE</td>
+                  <td colspan="12"><input type="text" id="sr-failure1" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-failure2" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-failure3" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-failure4" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- REMEDIES -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label sr-bold">REMEDIES</td>
+                  <td colspan="3" class="sr-field-label">Date :</td>
+                  <td colspan="3"><input type="date" id="sr-remedy-date" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td colspan="9"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- COUNTERMEASURE -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label">COUNTERMEASURE</td>
+                  <td colspan="15"><input type="text" id="sr-cm1" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-cm2" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-cm3" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17"><input type="text" id="sr-cm4" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- REMEDIAL ACTION header -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7" class="sr-remedial-hdr">REMEDIAL ACTION</td>
+                  <td colspan="10" class="sr-results-hdr">RESULTS</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- Column headers for parts table -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-col-hdr">No.</td>
+                  <td colspan="4" class="sr-col-hdr">List</td>
+                  <td colspan="3" class="sr-col-hdr">Model</td>
+                  <td class="sr-col-hdr">Q'ty</td>
+                  <td colspan="7" class="sr-col-hdr"></td>
+                  <td class="sr-col-hdr">PASS</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- Parts rows -->
+                <tbody id="sr-report-parts-body"></tbody>
+
+                <!-- Engineer signature -->
+                <tr style="height:30px">
+                  <td class="sr-c1"></td>
+                  <td colspan="10"></td>
+                  <td colspan="7" class="sr-engineer-cell">
+                    <input type="text" id="sr-engineer" class="sr-inp sr-inp-center sr-inp-bold" value="Mr.Thanakorn Kaewsawat" onchange="srMarkDirty()">
+                    <div style="font-size:10px;color:#6b7280;text-align:center">(Engineer)</div>
+                  </td>
+                  <td class="sr-c1"></td>
+                </tr>
+              </table>
+              </div>
+            </div><!-- end tab-report -->
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!--  TAB 2: PO COST                                -->
+            <!-- ══════════════════════════════════════════════ -->
+            <div id="sr-tab-pocost" class="sr-tab-content" style="display:none">
+              <div class="sr-excel-wrap">
+              <table class="sr-tbl">
+                <tr style="height:4px"><td colspan="18"></td></tr>
+                <tr style="height:80px">
+                  <td class="sr-c1"></td>
+                  <td colspan="13" rowspan="4" class="sr-logo-cell">
+                    <div class="sr-company-name">OVAL(THAILAND) LTD.</div>
+                    <div class="sr-company-sub">บริษัท โอวัล(ไทยแลนด์) จำกัด</div>
+                    <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260</div>
+                    <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615</div>
+                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                  </td>
+                  <td colspan="4" class="sr-title-cell">SERVICE REPORT</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">Date :</td>
+                  <td colspan="2" class="sr-ro" id="po-date-display"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">No :</td>
+                  <td colspan="2" class="sr-ro" id="po-no-display"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:20px"><td class="sr-c1"></td><td colspan="4"></td><td class="sr-c1"></td></tr>
+                <!-- Customer info (read-only, mirrors Report tab) -->
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-section-hdr">CUSTOMER INFORMATION</td><td class="sr-c1"></td></tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">COMPANY</td>
+                  <td colspan="7" class="sr-ro" id="po-company"></td>
+                  <td colspan="3" class="sr-label-right sr-bold">MODEL :</td>
+                  <td colspan="5" class="sr-ro" id="po-model"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">CONTACT PERSON</td>
+                  <td colspan="7" class="sr-ro" id="po-contact"></td>
+                  <td colspan="3" class="sr-label-right sr-bold">SERIAL :</td>
+                  <td colspan="5" class="sr-ro" id="po-serial"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">DEPARTMENT</td>
+                  <td colspan="7" class="sr-ro" id="po-dept"></td>
+                  <td colspan="4" class="sr-label-right" style="font-size:10px">OTHER EQUIPMENT :</td>
+                  <td colspan="2" class="sr-ro" id="po-eq1qty"></td>
+                  <td class="sr-ro" id="po-eq1unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">E-MAIL</td>
+                  <td colspan="7" class="sr-ro" id="po-email"></td>
+                  <td colspan="6" class="sr-ro"></td>
+                  <td class="sr-ro" id="po-eq2unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">MOBILE</td>
+                  <td colspan="7" class="sr-ro" id="po-mobile"></td>
+                  <td colspan="6" class="sr-ro"></td>
+                  <td class="sr-ro" id="po-eq3unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:6px"><td colspan="18"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-section-hdr">PROBLEM INFORMED</td><td class="sr-c1"></td></tr>
+                <!-- problem rows (read-only mirror) -->
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="7" class="sr-ro" id="po-prob1"></td><td colspan="10" class="sr-ro" id="po-nprob1"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="7" class="sr-ro" id="po-prob2"></td><td colspan="10" class="sr-ro" id="po-nprob2"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="7" class="sr-ro" id="po-prob3"></td><td colspan="10" class="sr-ro" id="po-nprob3"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="7" class="sr-ro" id="po-prob4"></td><td colspan="10" class="sr-ro" id="po-nprob4"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="7" class="sr-ro" id="po-prob5"></td><td colspan="10" class="sr-ro" id="po-nprob5"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-prob6"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label sr-bold">PROBLEMS</td>
+                  <td colspan="6" class="sr-ro" id="po-problem-eq"></td>
+                  <td colspan="9"></td><td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="5" class="sr-field-label" style="font-size:9.5px">INDICATIONS OF EQUIPMENT FAILURE</td>
+                  <td colspan="12" class="sr-ro" id="po-failure1"></td><td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-failure2"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-failure3"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-failure4"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label sr-bold">REMEDIES</td>
+                  <td colspan="3" class="sr-field-label">Date :</td>
+                  <td colspan="3" class="sr-ro" id="po-remedy-date"></td>
+                  <td colspan="9"></td><td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">COUNTERMEASURE</td>
+                  <td colspan="15" class="sr-ro" id="po-cm1"></td><td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-cm2"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-cm3"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-ro" id="po-cm4"></td><td class="sr-c1"></td></tr>
+                <!-- PO COST table -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7" class="sr-remedial-hdr">REMEDIAL ACTION</td>
+                  <td colspan="10" class="sr-results-hdr"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-col-hdr">No.</td>
+                  <td colspan="4" class="sr-col-hdr">List</td>
+                  <td colspan="3" class="sr-col-hdr">Model</td>
+                  <td class="sr-col-hdr">Q'ty</td>
+                  <td colspan="4" class="sr-col-hdr">COST</td>
+                  <td colspan="6" class="sr-col-hdr">PO NO.</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tbody id="sr-pocost-parts-body"></tbody>
+                <tr style="height:30px">
+                  <td class="sr-c1"></td>
+                  <td colspan="10"></td>
+                  <td colspan="7" class="sr-engineer-cell">
+                    <div id="po-engineer" style="font-weight:700;text-align:center;color:#1e3a5f"></div>
+                    <div style="font-size:10px;color:#6b7280;text-align:center">(Engineer)</div>
+                  </td>
+                  <td class="sr-c1"></td>
+                </tr>
+              </table>
+              </div>
+            </div><!-- end tab-pocost -->
+
+            <!-- ══════════════════════════════════════════════ -->
+            <!--  TAB 3: AFTER REPAIR                           -->
+            <!-- ══════════════════════════════════════════════ -->
+            <div id="sr-tab-afterrepair" class="sr-tab-content" style="display:none">
+              <div class="sr-excel-wrap">
+              <table class="sr-tbl">
+                <tr style="height:4px"><td colspan="18"></td></tr>
+                <tr style="height:80px">
+                  <td class="sr-c1"></td>
+                  <td colspan="13" rowspan="4" class="sr-logo-cell">
+                    <div class="sr-company-name">OVAL(THAILAND) LTD.</div>
+                    <div class="sr-company-sub">บริษัท โอวัล(ไทยแลนด์) จำกัด</div>
+                    <div class="sr-company-info">818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260</div>
+                    <div class="sr-company-info">โทร.02-130-7913-4 แฟ็กซ์ 02-130-5615</div>
+                    <div class="sr-company-info">Email : Narathip@ovalthailand.com</div>
+                  </td>
+                  <td colspan="4" class="sr-title-cell">REPAIR REPORT</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">Date :</td>
+                  <td colspan="2"><input type="date" id="sr-repair-date" class="sr-inp sr-inp-bold sr-inp-center" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td class="sr-label-right" colspan="2">No :</td>
+                  <td colspan="2" class="sr-ro" id="ar-no-display"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:20px"><td class="sr-c1"></td><td colspan="4"></td><td class="sr-c1"></td></tr>
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17" class="sr-section-hdr">CUSTOMER INFORMATION</td><td class="sr-c1"></td></tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">COMPANY</td>
+                  <td colspan="7" class="sr-ro" id="ar-company"></td>
+                  <td colspan="3" class="sr-label-right sr-bold">MODEL :</td>
+                  <td colspan="5" class="sr-ro" id="ar-model"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">CONTACT PERSON</td>
+                  <td colspan="7" class="sr-ro" id="ar-contact"></td>
+                  <td colspan="3" class="sr-label-right sr-bold">SERIAL :</td>
+                  <td colspan="5" class="sr-ro" id="ar-serial"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">POSITION</td>
+                  <td colspan="7" class="sr-ro" id="ar-dept"></td>
+                  <td colspan="4" class="sr-label-right" style="font-size:10px">OTHER EQUIPMENT :</td>
+                  <td colspan="2" class="sr-ro" id="ar-eq1qty"></td>
+                  <td class="sr-ro" id="ar-eq1unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">E-MAIL</td>
+                  <td colspan="7" class="sr-ro" id="ar-email"></td>
+                  <td colspan="6" class="sr-ro"></td>
+                  <td class="sr-ro" id="ar-eq2unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td><td colspan="2" class="sr-field-label">MOBILE</td>
+                  <td colspan="7" class="sr-ro" id="ar-mobile"></td>
+                  <td colspan="6" class="sr-ro"></td>
+                  <td class="sr-ro" id="ar-eq3unit"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:6px"><td colspan="18"></td></tr>
+
+                <!-- FUNCTION INSPECTION -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" class="sr-section-hdr">FUNCTION INSPECTION</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- 4 inspection rows, 2 columns each -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7"><input type="text" id="ar-fi1" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td colspan="3"></td>
+                  <td colspan="7"><input type="text" id="ar-fi1r" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7"><input type="text" id="ar-fi2" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td colspan="3"></td>
+                  <td colspan="7"><input type="text" id="ar-fi2r" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7"><input type="text" id="ar-fi3" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td colspan="3"></td>
+                  <td colspan="7"><input type="text" id="ar-fi3r" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="7"><input type="text" id="ar-fi4" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td colspan="3"></td>
+                  <td colspan="7"><input type="text" id="ar-fi4r" class="sr-inp sr-inp-bold sr-inp-center" placeholder="GOOD" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <tr style="height:22px"><td class="sr-c1"></td><td colspan="17"></td><td class="sr-c1"></td></tr>
+
+                <!-- Test Function header -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-field-label sr-bold" style="text-align:center">Test Function</td>
+                  <td colspan="15"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- Stability Test -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="6" class="sr-section-hdr2" style="font-size:10px">Stability Test</td>
+                  <td colspan="4" class="sr-section-hdr2" style="font-size:10px">Self check</td>
+                  <td colspan="7" class="sr-section-hdr2" style="font-size:10px">Calibration result</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="6" style="font-size:9px;text-align:center;border:1px solid #9ca3af;color:#374151">(Stability check not over 0.1 mL/min Close valve both side)</td>
+                  <td colspan="4" style="font-size:9px;text-align:center;border:1px solid #9ca3af;color:#374151">Valve check</td>
+                  <td colspan="7" style="font-size:9px;text-align:center;border:1px solid #9ca3af;color:#374151">Pressure Sensor check</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- Stability test column headers -->
+                <tr style="height:20px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-col-hdr">No.</td>
+                  <td colspan="2" class="sr-col-hdr">Result</td>
+                  <td class="sr-col-hdr">No.</td>
+                  <td class="sr-col-hdr">Result</td>
+                  <td colspan="2" class="sr-col-hdr">No.</td>
+                  <td colspan="2" class="sr-col-hdr">Result</td>
+                  <td colspan="2" class="sr-col-hdr">No.</td>
+                  <td colspan="2" class="sr-col-hdr">Name</td>
+                  <td colspan="2" class="sr-col-hdr">Result</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <!-- Stability data rows 1-5 -->
+                <tbody id="ar-stability-body"></tbody>
+
+                <!-- REMARK -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="10"></td>
+                  <td colspan="7" class="sr-field-label sr-bold">REMARK</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="10"></td>
+                  <td colspan="7"><input type="text" id="ar-remark" class="sr-inp" onchange="srMarkDirty()"></td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- Leak Judgement Test -->
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" class="sr-section-hdr2">Leak Judgement Test</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" style="font-size:9px;text-align:center;border:1px solid #9ca3af;color:#374151">(Leak check must over 0.1 mL/min Open Valve each side)</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:20px">
+                  <td class="sr-c1"></td>
+                  <td colspan="6" class="sr-section-hdr2" style="font-size:10px">Work Side (Open)</td>
+                  <td colspan="4"></td>
+                  <td colspan="7" class="sr-section-hdr2" style="font-size:10px">Master Side (Open)</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tr style="height:20px">
+                  <td class="sr-c1"></td>
+                  <td colspan="2" class="sr-col-hdr">No.</td>
+                  <td colspan="4" class="sr-col-hdr">Result</td>
+                  <td colspan="4"></td>
+                  <td colspan="2" class="sr-col-hdr">No.</td>
+                  <td colspan="5" class="sr-col-hdr">Result</td>
+                  <td class="sr-c1"></td>
+                </tr>
+                <tbody id="ar-leak-body"></tbody>
+                <tr style="height:22px">
+                  <td class="sr-c1"></td>
+                  <td colspan="17" style="font-size:10px;color:#6b7280;font-style:italic;text-align:center">**** = Large leak</td>
+                  <td class="sr-c1"></td>
+                </tr>
+
+                <!-- Engineer signature -->
+                <tr style="height:30px">
+                  <td class="sr-c1"></td>
+                  <td colspan="10"></td>
+                  <td colspan="7" class="sr-engineer-cell">
+                    <div id="ar-engineer" style="font-weight:700;text-align:center;color:#1e3a5f"></div>
+                    <div style="font-size:10px;color:#6b7280;text-align:center">(Engineer)</div>
+                  </td>
+                  <td class="sr-c1"></td>
+                </tr>
+              </table>
+              </div>
+            </div><!-- end tab-afterrepair -->
+
+            <!-- Save/Delete buttons -->
+            <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;padding:4px 0">
+              <button class="btn btn-ghost btn-sm" onclick="srAddPart()">➕ เพิ่มแถวอะไหล่</button>
+              <button class="btn btn-ghost btn-sm" onclick="srRemovePart()">➖ ลบแถวสุดท้าย</button>
+              <button class="btn btn-primary btn-sm" onclick="srSave()">💾 บันทึก</button>
+              <button class="btn btn-danger btn-sm" id="sr-delete-btn" onclick="srDelete()" style="display:none">🗑️ ลบ Report นี้</button>
+            </div>
+          </div><!-- end sr-form-wrap -->
+
+          <!-- LIST VIEW -->
+          <div id="sr-list-wrap" style="display:none">
+            <div class="card">
+              <div class="card-title">📋 รายการ Service Report ทั้งหมด</div>
+              <div class="search-wrap mb12">
+                <span class="search-icon">🔍</span>
+                <input type="text" placeholder="ค้นหา Report No., บริษัท, Model..." oninput="srFilterList(this.value)" id="sr-search">
+              </div>
+              <div id="sr-list-container"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- PO SELECTION POPUP -->
+        <div class="overlay" id="sr-po-popup-overlay" onclick="if(event.target===this)this.classList.remove('open')">
+          <div class="po-popup">
+            <div class="po-popup-title" id="sr-po-popup-title">🔖 เลือก PO</div>
+            <div id="sr-po-popup-list"></div>
+            <div style="margin-top:10px"><button class="btn btn-ghost btn-sm fw" onclick="document.getElementById('sr-po-popup-overlay').classList.remove('open')">ยกเลิก</button></div>
+          </div>
+        </div>
+      </div>
+
       <div class="page" id="page-settings">
         <div class="card" style="max-width:460px">
           <div class="card-title">⚙️ ตั้งค่าการคำนวณ</div>
@@ -846,10 +1604,37 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 
 <!-- Firebase SDK -->
 <script type="module">
-import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js';
-import { getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy } from 'https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js';
+// Dynamic Firebase import — if fails, app still works in Local Mode
+let initializeApp, getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy;
+let _firebaseLoaded = false;
 
-// ============ STATE ============
+async function loadFirebaseSDK() {
+  try {
+    const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
+    const storeMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
+    initializeApp = appMod.initializeApp;
+    getFirestore = storeMod.getFirestore;
+    collection = storeMod.collection;
+    doc = storeMod.doc;
+    getDocs = storeMod.getDocs;
+    addDoc = storeMod.addDoc;
+    setDoc = storeMod.setDoc;
+    deleteDoc = storeMod.deleteDoc;
+    onSnapshot = storeMod.onSnapshot;
+    query = storeMod.query;
+    orderBy = storeMod.orderBy;
+    _firebaseLoaded = true;
+    return true;
+  } catch(e) {
+    console.warn('[Firebase SDK] ไม่สามารถโหลด Firebase SDK ได้:', e.message);
+    _firebaseLoaded = false;
+    return false;
+  }
+}
+
+// ============ STATE ======
+// Signal to non-module scripts that module loaded OK
+window._moduleLoaded = true;
 window.db = null;
 window.isFirebase = false;
 window.localData = {
@@ -889,6 +1674,25 @@ window.showSetup = function() {
 }
 
 function initFirebase(cfg) {
+  // Load Firebase SDK dynamically, fallback to local if fails
+  loadFirebaseSDK().then(function(loaded) {
+    if (!loaded) {
+      console.warn('[initFirebase] Firebase SDK โหลดไม่ได้ → Local Mode');
+      window.isFirebase = false;
+      loadLocal();
+      document.getElementById('setup-screen').style.display = 'none';
+      document.getElementById('app').style.display = 'flex';
+      document.getElementById('sync-label').textContent = 'Local Mode (No Network)';
+      document.getElementById('sync-dot').style.background = 'var(--yellow)';
+      document.getElementById('fb-status-text').textContent = 'Firebase SDK โหลดไม่ได้ — ทำงานแบบ Offline';
+      initUI();
+      return;
+    }
+    _initFirebaseInner(cfg);
+  });
+}
+
+function _initFirebaseInner(cfg) {
   try {
     const app = initializeApp(cfg);
     window.db = getFirestore(app);
@@ -3378,7 +4182,7 @@ window.openModal = id => document.getElementById(id).classList.add('open');
 window.closeModal = id => document.getElementById(id).classList.remove('open');
 document.querySelectorAll('.overlay').forEach(m=>m.addEventListener('click',e=>{if(e.target===m)m.classList.remove('open')}));
 
-const PAGE_TITLES = {dashboard:'📊 Dashboard',stock:'📦 Stock สินค้า',restock:'➕ เติมสินค้า',withdraw:'📤 เบิกสินค้า',activity:'🗂️ กิจกรรมทั้งหมด',customers:'👥 รายชื่อลูกค้า',settings:'⚙️ ตั้งค่า'};
+const PAGE_TITLES = {dashboard:'📊 Dashboard',stock:'📦 Stock สินค้า',restock:'➕ เติมสินค้า',withdraw:'📤 เบิกสินค้า',activity:'🗂️ กิจกรรมทั้งหมด',customers:'👥 รายชื่อลูกค้า',settings:'⚙️ ตั้งค่า',servicereport:'📋 Service Report'};
 window.showPage = function(id, btn) {
   document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
   document.querySelectorAll('.nav-btn').forEach(b=>b.classList.remove('active'));
@@ -3912,7 +4716,779 @@ document.getElementById('scanner-modal').addEventListener('click', function(e) {
 document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScanner(); });
 
 
-initFirebase(FIREBASE_CONFIG);
+
+// ════════════════════════════════════════════════
+//  SERVICE REPORT MODULE (v2 - Excel-accurate)
+// ════════════════════════════════════════════════
+(function() {
+
+  let srCurrentId = null;
+  let srDirty = false;
+  let srPartsCount = 10;
+  let srCurrentTab = 'report';
+
+  // Default stability/leak data
+  const DEFAULT_STABILITY = [
+    {no:'1',res:'',no2:'6',res2:'',vno:'1',vres:'No error',cno:'1',cname:'DP sensor',cres:'OK'},
+    {no:'2',res:'',no2:'7',res2:'',vno:'2',vres:'No error',cno:'2',cname:'Work sensor',cres:'OK'},
+    {no:'3',res:'',no2:'8',res2:'',vno:'3',vres:'No error',cno:'3',cname:'Test sensor',cres:'OK'},
+    {no:'4',res:'',no2:'9',res2:'',vno:'4',vres:'No error',cno:'',cname:'',cres:''},
+    {no:'5',res:'',no2:'10',res2:'',vno:'5',vres:'No error',cno:'',cname:'',cres:''},
+  ];
+  const DEFAULT_LEAK = [
+    {wno:'1',wres:'****',mno:'1',mres:'****'},
+    {wno:'2',wres:'****',mno:'2',mres:'****'},
+    {wno:'3',wres:'****',mno:'3',mres:'****'},
+    {wno:'4',wres:'',mno:'4',mres:''},
+    {wno:'5',wres:'',mno:'5',mres:''},
+  ];
+
+  // ── helpers ───────────────────────────────────
+  function v(id) { const e=document.getElementById(id); return e?e.value:''; }
+  function sv(id, val) { const e=document.getElementById(id); if(e) e.value=val||''; }
+  function st(id, val) { const e=document.getElementById(id); if(e) e.textContent=val||''; }
+
+  function srGetReports() {
+    try { return JSON.parse(localStorage.getItem('sr_reports')||'[]'); } catch(e) { return []; }
+  }
+  function srSaveReports(arr) { localStorage.setItem('sr_reports', JSON.stringify(arr)); }
+
+  // ── Collect full form data ──────────────────
+  function srGetData() {
+    // Parts from report tab
+    const parts = [];
+    for(let i=0; i<srPartsCount; i++) {
+      parts.push({
+        list:  v(`sr-pt-list-${i}`),
+        model: v(`sr-pt-model-${i}`),
+        qty:   parseFloat(v(`sr-pt-qty-${i}`))||0,
+        po:    v(`sr-pt-po-${i}`),
+        result: v(`sr-pt-result-${i}`)
+      });
+    }
+    // PO cost extras
+    const pocosts = [];
+    for(let i=0; i<srPartsCount; i++) {
+      pocosts.push({ cost: parseFloat(v(`sr-poc-cost-${i}`))||0, po: v(`sr-poc-po-${i}`) });
+    }
+    // Stability rows
+    const stability = [];
+    for(let i=0; i<5; i++) {
+      stability.push({
+        no:v(`ar-st-no-${i}`), res:v(`ar-st-res-${i}`),
+        no2:v(`ar-st-no2-${i}`), res2:v(`ar-st-res2-${i}`),
+        vno:v(`ar-st-vno-${i}`), vres:v(`ar-st-vres-${i}`),
+        cno:v(`ar-st-cno-${i}`), cname:v(`ar-st-cname-${i}`), cres:v(`ar-st-cres-${i}`)
+      });
+    }
+    // Leak rows
+    const leak = [];
+    for(let i=0; i<5; i++) {
+      leak.push({ wno:v(`ar-lk-wno-${i}`), wres:v(`ar-lk-wres-${i}`), mno:v(`ar-lk-mno-${i}`), mres:v(`ar-lk-mres-${i}`) });
+    }
+    return {
+      reportNo: v('sr-no'), date: v('sr-date'), remedyDate: v('sr-remedy-date'),
+      repairDate: v('sr-repair-date'),
+      company: v('sr-company'), contact: v('sr-contact'), dept: v('sr-dept'),
+      email: v('sr-email'), mobile: v('sr-mobile'),
+      model: v('sr-model'), serial: v('sr-serial'),
+      eq1qty: v('sr-eq1qty'), eq1unit: v('sr-eq1unit'),
+      eq2qty: v('sr-eq2qty'), eq2unit: v('sr-eq2unit'),
+      eq3qty: v('sr-eq3qty'), eq3unit: v('sr-eq3unit'),
+      prob1:v('sr-prob1'), prob2:v('sr-prob2'), prob3:v('sr-prob3'),
+      prob4:v('sr-prob4'), prob5:v('sr-prob5'), prob6:v('sr-prob6'),
+      problemEq: v('sr-problem-eq'),
+      failure1:v('sr-failure1'), failure2:v('sr-failure2'),
+      failure3:v('sr-failure3'), failure4:v('sr-failure4'),
+      cm1:v('sr-cm1'), cm2:v('sr-cm2'), cm3:v('sr-cm3'), cm4:v('sr-cm4'),
+      engineer: v('sr-engineer'),
+      // After repair
+      fi1:v('ar-fi1'), fi1r:v('ar-fi1r'), fi2:v('ar-fi2'), fi2r:v('ar-fi2r'),
+      fi3:v('ar-fi3'), fi3r:v('ar-fi3r'), fi4:v('ar-fi4'), fi4r:v('ar-fi4r'),
+      remark: v('ar-remark'),
+      parts, pocosts, stability, leak,
+      updatedAt: Date.now()
+    };
+  }
+
+  // ── Populate form ──────────────────────────────
+  function srPopulateForm(d) {
+    sv('sr-no', d.reportNo); sv('sr-date', d.date); sv('sr-remedy-date', d.remedyDate);
+    sv('sr-repair-date', d.repairDate);
+    sv('sr-company', d.company); sv('sr-contact', d.contact); sv('sr-dept', d.dept);
+    sv('sr-email', d.email); sv('sr-mobile', d.mobile);
+    sv('sr-model', d.model); sv('sr-serial', d.serial);
+    sv('sr-eq1qty', d.eq1qty); sv('sr-eq1unit', d.eq1unit);
+    sv('sr-eq2qty', d.eq2qty); sv('sr-eq2unit', d.eq2unit);
+    sv('sr-eq3qty', d.eq3qty); sv('sr-eq3unit', d.eq3unit);
+    sv('sr-prob1',d.prob1); sv('sr-prob2',d.prob2); sv('sr-prob3',d.prob3);
+    sv('sr-prob4',d.prob4); sv('sr-prob5',d.prob5); sv('sr-prob6',d.prob6);
+    sv('sr-problem-eq', d.problemEq);
+    sv('sr-failure1',d.failure1); sv('sr-failure2',d.failure2);
+    sv('sr-failure3',d.failure3); sv('sr-failure4',d.failure4);
+    sv('sr-cm1',d.cm1); sv('sr-cm2',d.cm2); sv('sr-cm3',d.cm3); sv('sr-cm4',d.cm4);
+    sv('sr-engineer', d.engineer||'Mr.Thanakorn Kaewsawat');
+    sv('ar-fi1',d.fi1); sv('ar-fi1r',d.fi1r); sv('ar-fi2',d.fi2); sv('ar-fi2r',d.fi2r);
+    sv('ar-fi3',d.fi3); sv('ar-fi3r',d.fi3r); sv('ar-fi4',d.fi4); sv('ar-fi4r',d.fi4r);
+    sv('ar-remark', d.remark);
+    srPartsCount = (d.parts && d.parts.length >= 10) ? d.parts.length : 10;
+    renderReportParts(d.parts||[]);
+    renderPoCostParts(d.parts||[], d.pocosts||[]);
+    renderStability(d.stability||DEFAULT_STABILITY);
+    renderLeakRows(d.leak||DEFAULT_LEAK);
+    syncPoCostMirror();
+    syncAfterRepairMirror();
+    srMarkClean();
+    srRefreshDatalist();
+  }
+
+  function srClearForm() {
+    const today = new Date().toISOString().split('T')[0];
+    const reports = srGetReports();
+    const yr = new Date().getFullYear().toString().slice(-2);
+    const mo = String(new Date().getMonth()+1).padStart(2,'0');
+    const seq = String(reports.length+1).padStart(2,'0');
+    const autoNo = `FKD-RP-${yr}-${mo}-${seq}`;
+    sv('sr-no', autoNo); sv('sr-date', today); sv('sr-remedy-date', today);
+    sv('sr-repair-date', today);
+    ['sr-company','sr-contact','sr-dept','sr-email','sr-mobile','sr-model','sr-serial',
+     'sr-eq1qty','sr-eq1unit','sr-eq2qty','sr-eq2unit','sr-eq3qty','sr-eq3unit',
+     'sr-prob1','sr-prob2','sr-prob3','sr-prob4','sr-prob5','sr-prob6',
+     'sr-problem-eq','sr-failure1','sr-failure2','sr-failure3','sr-failure4',
+     'sr-cm1','sr-cm2','sr-cm3','sr-cm4','ar-remark',
+     'ar-fi1','ar-fi1r','ar-fi2','ar-fi2r','ar-fi3','ar-fi3r','ar-fi4','ar-fi4r'
+    ].forEach(id => sv(id,''));
+    sv('sr-engineer','Mr.Thanakorn Kaewsawat');
+    srPartsCount = 10;
+    renderReportParts([]);
+    renderPoCostParts([],[]);
+    renderStability(DEFAULT_STABILITY.map(r=>({...r,res:'',res2:''})));
+    renderLeakRows(DEFAULT_LEAK);
+    syncPoCostMirror();
+    syncAfterRepairMirror();
+    srMarkClean();
+    srRefreshDatalist();
+  }
+
+  // ── Render Report parts ──────────────────────
+  function renderReportParts(parts) {
+    const tbody = document.getElementById('sr-report-parts-body');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    for(let i=0; i<srPartsCount; i++) {
+      const p = (parts&&parts[i]) ? parts[i] : {};
+      const tr = document.createElement('tr');
+      tr.style.height = '22px';
+      const pass = p.result==='PASS';
+      const fail = p.result==='FAIL';
+      tr.innerHTML = `
+        <td class="sr-c1"></td>
+        <td class="sr-part-no">${i+1}</td>
+        <td colspan="4"><input type="text" id="sr-pt-list-${i}" value="${esc(p.list)}" class="sr-inp sr-inp-bold" placeholder="" list="sr-stock-dl" oninput="srPartInput(${i})" onchange="srMarkDirty();syncPoCostRow(${i})"></td>
+        <td colspan="3"><input type="text" id="sr-pt-model-${i}" value="${esc(p.model)}" class="sr-inp sr-inp-bold sr-inp-center" placeholder="" onchange="srMarkDirty();syncPoCostRow(${i})"></td>
+        <td><input type="number" id="sr-pt-qty-${i}" value="${p.qty||''}" class="sr-inp sr-inp-center" min="0" oninput="srMarkDirty();syncPoCostRow(${i})"></td>
+        <td colspan="7"></td>
+        <td class="${pass?'sr-part-pass':fail?'sr-part-fail':''}">
+          <select id="sr-pt-result-${i}" class="sr-inp sr-inp-center" onchange="srPartResultChange(${i});srMarkDirty()">
+            <option value="">—</option>
+            <option value="PASS" ${pass?'selected':''}>✅ PASS</option>
+            <option value="FAIL" ${fail?'selected':''}>❌ FAIL</option>
+            <option value="N/A" ${p.result==='N/A'?'selected':''}>N/A</option>
+          </select>
+        </td>
+        <td class="sr-c1"></td>`;
+      tbody.appendChild(tr);
+    }
+    renderStockDL();
+  }
+
+  // ── Render PO Cost parts ──────────────────────
+  function renderPoCostParts(parts, pocosts) {
+    const tbody = document.getElementById('sr-pocost-parts-body');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    for(let i=0; i<srPartsCount; i++) {
+      const p = (parts&&parts[i]) ? parts[i] : {};
+      const pc = (pocosts&&pocosts[i]) ? pocosts[i] : {};
+      const tr = document.createElement('tr');
+      tr.style.height = '22px';
+      tr.innerHTML = `
+        <td class="sr-c1"></td>
+        <td class="sr-part-no">${i+1}</td>
+        <td colspan="4" class="sr-ro" id="poc-list-${i}">${esc(p.list)}</td>
+        <td colspan="3" class="sr-ro" id="poc-model-${i}">${esc(p.model)}</td>
+        <td class="sr-ro sr-inp-center" id="poc-qty-${i}">${p.qty||''}</td>
+        <td colspan="4"><input type="number" id="sr-poc-cost-${i}" value="${pc.cost||''}" class="sr-inp sr-inp-right" placeholder="0.00" oninput="srMarkDirty()"></td>
+        <td colspan="6"><input type="text" id="sr-poc-po-${i}" value="${esc(pc.po)}" class="sr-inp sr-inp-center" placeholder="PO No." onfocus="srCheckPoDuplicate(${i})" onchange="srMarkDirty()"></td>
+        <td class="sr-c1"></td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  function syncPoCostRow(i) {
+    const listEl = document.getElementById(`poc-list-${i}`);
+    const modelEl = document.getElementById(`poc-model-${i}`);
+    const qtyEl = document.getElementById(`poc-qty-${i}`);
+    if(listEl) listEl.textContent = v(`sr-pt-list-${i}`);
+    if(modelEl) modelEl.textContent = v(`sr-pt-model-${i}`);
+    if(qtyEl) qtyEl.textContent = v(`sr-pt-qty-${i}`);
+  }
+
+  // ── Render Stability rows ─────────────────────
+  function renderStability(rows) {
+    const tbody = document.getElementById('ar-stability-body');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    for(let i=0; i<5; i++) {
+      const r = rows[i]||{};
+      const tr = document.createElement('tr');
+      tr.style.height='22px';
+      tr.innerHTML=`
+        <td class="sr-c1"></td>
+        <td colspan="2" class="sr-part-no"><input type="text" id="ar-st-no-${i}" value="${esc(r.no)}" class="sr-inp sr-inp-center"></td>
+        <td colspan="2"><input type="text" id="ar-st-res-${i}" value="${esc(r.res)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td class="sr-part-no"><input type="text" id="ar-st-no2-${i}" value="${esc(r.no2)}" class="sr-inp sr-inp-center"></td>
+        <td><input type="text" id="ar-st-res2-${i}" value="${esc(r.res2)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td colspan="2" class="sr-part-no"><input type="text" id="ar-st-vno-${i}" value="${esc(r.vno)}" class="sr-inp sr-inp-center"></td>
+        <td colspan="2"><input type="text" id="ar-st-vres-${i}" value="${esc(r.vres)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td colspan="2" class="sr-part-no"><input type="text" id="ar-st-cno-${i}" value="${esc(r.cno)}" class="sr-inp sr-inp-center"></td>
+        <td colspan="2"><input type="text" id="ar-st-cname-${i}" value="${esc(r.cname)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td colspan="2"><input type="text" id="ar-st-cres-${i}" value="${esc(r.cres)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td class="sr-c1"></td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  // ── Render Leak rows ──────────────────────────
+  function renderLeakRows(rows) {
+    const tbody = document.getElementById('ar-leak-body');
+    if(!tbody) return;
+    tbody.innerHTML = '';
+    for(let i=0; i<5; i++) {
+      const r = rows[i]||{};
+      const tr = document.createElement('tr');
+      tr.style.height='22px';
+      tr.innerHTML=`
+        <td class="sr-c1"></td>
+        <td colspan="2" class="sr-part-no"><input type="text" id="ar-lk-wno-${i}" value="${esc(r.wno)}" class="sr-inp sr-inp-center"></td>
+        <td colspan="4"><input type="text" id="ar-lk-wres-${i}" value="${esc(r.wres)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td colspan="4"></td>
+        <td colspan="2" class="sr-part-no"><input type="text" id="ar-lk-mno-${i}" value="${esc(r.mno)}" class="sr-inp sr-inp-center"></td>
+        <td colspan="5"><input type="text" id="ar-lk-mres-${i}" value="${esc(r.mres)}" class="sr-inp sr-inp-center" onchange="srMarkDirty()"></td>
+        <td class="sr-c1"></td>`;
+      tbody.appendChild(tr);
+    }
+  }
+
+  // ── Sync PO Cost tab mirror ─────────────────
+  function syncPoCostMirror() {
+    const fields = ['date','no','company','contact','dept','email','mobile','model','serial',
+                    'eq1qty','eq1unit','eq2qty','eq2unit','eq3qty','eq3unit',
+                    'prob1','prob2','prob3','prob4','prob5','prob6',
+                    'problem-eq','failure1','failure2','failure3','failure4',
+                    'cm1','cm2','cm3','cm4','remedy-date'];
+    fields.forEach(f => {
+      const val = v(`sr-${f}`);
+      const el = document.getElementById(`po-${f.replace('-','')}`)||document.getElementById(`po-${f}`);
+      if(el) el.textContent = val;
+    });
+    const en = document.getElementById('po-engineer');
+    if(en) en.textContent = v('sr-engineer');
+    // date/no display
+    const dd = document.getElementById('po-date-display');
+    const nd = document.getElementById('po-no-display');
+    if(dd) dd.textContent = v('sr-date');
+    if(nd) nd.textContent = v('sr-no');
+    // Parts
+    for(let i=0; i<srPartsCount; i++) syncPoCostRow(i);
+  }
+
+  // ── Sync After Repair tab mirror ─────────────
+  function syncAfterRepairMirror() {
+    const map = {
+      'ar-company':'sr-company','ar-contact':'sr-contact','ar-dept':'sr-dept',
+      'ar-email':'sr-email','ar-mobile':'sr-mobile',
+      'ar-model':'sr-model','ar-serial':'sr-serial',
+      'ar-eq1qty':'sr-eq1qty','ar-eq1unit':'sr-eq1unit',
+      'ar-eq2qty':'sr-eq2qty','ar-eq2unit':'sr-eq2unit',
+      'ar-eq3qty':'sr-eq3qty','ar-eq3unit':'sr-eq3unit',
+    };
+    Object.entries(map).forEach(([dst,src]) => {
+      const el = document.getElementById(dst);
+      if(el) el.textContent = v(src);
+    });
+    const an = document.getElementById('ar-no-display');
+    if(an) an.textContent = v('sr-no');
+    const ae = document.getElementById('ar-engineer');
+    if(ae) ae.textContent = v('sr-engineer');
+  }
+
+  // ── Tab switching ────────────────────────────
+  window.srSwitchTab = function(tab) {
+    srCurrentTab = tab;
+    ['report','pocost','afterrepair'].forEach(t => {
+      const tc = document.getElementById(`sr-tab-${t}`);
+      const btn = document.getElementById(`tab-${t}`);
+      if(tc) tc.style.display = t===tab ? 'block' : 'none';
+      if(btn) { btn.classList.toggle('sr-tab-active', t===tab); }
+    });
+    if(tab==='pocost') syncPoCostMirror();
+    if(tab==='afterrepair') syncAfterRepairMirror();
+  };
+
+  // ── Part result styling ──────────────────────
+  window.srPartResultChange = function(i) {
+    const sel = document.getElementById(`sr-pt-result-${i}`);
+    const td = sel && sel.closest('td');
+    if(!td) return;
+    td.className = sel.value==='PASS' ? 'sr-part-pass' : sel.value==='FAIL' ? 'sr-part-fail' : '';
+  };
+
+  // ── Part input with autofill from stock ──────
+  window.srPartInput = function(i) {
+    srMarkDirty();
+    const listVal = v(`sr-pt-list-${i}`).trim();
+    if(!listVal) return;
+    const stocks = (window.localData&&window.localData.stocks)||[];
+    const matches = stocks.filter(s=>s.model&&s.model.toLowerCase()===listVal.toLowerCase());
+    if(matches.length===1) {
+      const modelEl = document.getElementById(`sr-pt-model-${i}`);
+      if(modelEl&&!modelEl.value) modelEl.value = matches[0].model;
+      const costEl = document.getElementById(`sr-poc-cost-${i}`);
+      if(costEl&&!costEl.value&&typeof calcCostThb==='function') {
+        const c = calcCostThb(matches[0]);
+        if(c) costEl.value = c.toFixed(2);
+      }
+      const poEl = document.getElementById(`sr-poc-po-${i}`);
+      if(poEl&&!poEl.value&&matches[0].po) poEl.value = matches[0].po;
+    } else if(matches.length>1) {
+      srShowPoPopup('part', i, listVal, matches);
+    }
+    syncPoCostRow(i);
+  };
+
+  // ── Datalist ─────────────────────────────────
+  function srRefreshDatalist() {
+    const custs = ((window.localData&&window.localData.customers)||[]).map(c=>c.name||'').filter(Boolean);
+    const dl = document.getElementById('sr-company-list');
+    if(dl) dl.innerHTML = [...new Set(custs)].map(c=>`<option value="${esc(c)}">`).join('');
+    const models = ((window.localData&&window.localData.stocks)||[]).map(s=>s.model||'').filter(Boolean);
+    const dlm = document.getElementById('sr-model-list');
+    if(dlm) dlm.innerHTML = [...new Set(models)].map(m=>`<option value="${esc(m)}">`).join('');
+  }
+
+  function renderStockDL() {
+    let dl = document.getElementById('sr-stock-dl');
+    if(!dl){ dl=document.createElement('datalist'); dl.id='sr-stock-dl'; document.body.appendChild(dl); }
+    const stocks = (window.localData&&window.localData.stocks)||[];
+    dl.innerHTML = [...new Set(stocks.map(s=>s.model||'').filter(Boolean))].map(n=>`<option value="${esc(n)}">`).join('');
+  }
+
+  // ── Autofill customer ────────────────────────
+  window.srAutofillCustomer = function() {
+    const company = v('sr-company').trim();
+    if(!company) return;
+    const cust = ((window.localData&&window.localData.customers)||[]).find(c=>
+      c.name&&c.name.toLowerCase()===company.toLowerCase());
+    if(cust) {
+      if(!v('sr-contact')&&cust.contact) sv('sr-contact',cust.contact);
+      if(!v('sr-dept')&&cust.dept) sv('sr-dept',cust.dept);
+      if(!v('sr-email')&&cust.email) sv('sr-email',cust.email);
+      if(!v('sr-mobile')&&cust.phone) sv('sr-mobile',cust.phone);
+    }
+    srMarkDirty();
+  };
+
+  // ── Check model duplicate ────────────────────
+  window.srCheckModelDuplicate = function() {
+    const model = v('sr-model').trim();
+    if(!model) return;
+    const matches = ((window.localData&&window.localData.stocks)||[]).filter(s=>
+      s.model&&s.model.toLowerCase()===model.toLowerCase());
+    if(matches.length>1) srShowPoPopup('model', null, model, matches);
+    srMarkDirty();
+  };
+
+  window.srCheckPoDuplicate = function(i) {
+    const listVal = v(`sr-pt-list-${i}`).trim();
+    if(!listVal) return;
+    const matches = ((window.localData&&window.localData.stocks)||[]).filter(s=>
+      s.model&&s.model.toLowerCase()===listVal.toLowerCase());
+    if(matches.length>1) srShowPoPopup('part', i, listVal, matches);
+  };
+
+  // ── PO Popup ─────────────────────────────────
+  function srShowPoPopup(type, rowIdx, name, matches) {
+    const overlay=document.getElementById('sr-po-popup-overlay');
+    const title=document.getElementById('sr-po-popup-title');
+    const list=document.getElementById('sr-po-popup-list');
+    if(!overlay||!title||!list) return;
+    title.textContent=`🔖 "${name}" มี ${matches.length} PO — เลือกที่ต้องการ`;
+    list.innerHTML=matches.map(s=>{
+      const cost=typeof calcCostThb==='function'?calcCostThb(s):(s.priceThb||0);
+      return `<div class="po-option" onclick="srPickPo('${type}',${rowIdx},'${esc(s.model)}','${esc(s.po||'')}',${cost.toFixed(2)});document.getElementById('sr-po-popup-overlay').classList.remove('open')">
+        <div style="font-weight:600;color:var(--accent)">${s.po||'(ไม่มี PO)'}</div>
+        <div class="po-detail">Model: ${s.model} | คงเหลือ: ${s.qty||0} | ราคา: ฿${cost.toFixed(2)}</div>
+      </div>`;
+    }).join('');
+    overlay.classList.add('open');
+  }
+
+  window.srPickPo = function(type, rowIdx, model, po, cost) {
+    if(type==='model') { sv('sr-model', model); }
+    else if(type==='part'&&rowIdx!==null) {
+      const modelEl=document.getElementById(`sr-pt-model-${rowIdx}`);
+      if(modelEl) modelEl.value=model;
+      const poEl=document.getElementById(`sr-poc-po-${rowIdx}`);
+      if(poEl) poEl.value=po;
+      const costEl=document.getElementById(`sr-poc-cost-${rowIdx}`);
+      if(costEl&&!costEl.value) costEl.value=cost;
+      syncPoCostRow(rowIdx);
+    }
+    srMarkDirty();
+  };
+
+  // ── Dirty state ──────────────────────────────
+  window.srMarkDirty = function() { srDirty=true; };
+  function srMarkClean() { srDirty=false; }
+
+  // ── Add/Remove parts ─────────────────────────
+  window.srAddPart = function() {
+    const d = srGetData();
+    srPartsCount++;
+    renderReportParts(d.parts);
+    renderPoCostParts(d.parts, d.pocosts);
+    if(typeof toast==='function') toast('➕ เพิ่มแถวแล้ว');
+  };
+  window.srRemovePart = function() {
+    if(srPartsCount<=1) return;
+    const d = srGetData();
+    d.parts.pop(); d.pocosts.pop();
+    srPartsCount--;
+    renderReportParts(d.parts);
+    renderPoCostParts(d.parts, d.pocosts);
+  };
+
+  // ── Save/New/Delete ──────────────────────────
+  window.srNew = function() {
+    if(srDirty&&!confirm('มีข้อมูลที่ยังไม่ได้บันทึก ต้องการสร้างใหม่หรือไม่?')) return;
+    srCurrentId=null;
+    srClearForm();
+    document.getElementById('sr-form-wrap').style.display='';
+    document.getElementById('sr-list-wrap').style.display='none';
+    document.getElementById('sr-delete-btn').style.display='none';
+    document.getElementById('sr-current-label').textContent='📝 Report ใหม่';
+    srSwitchTab('report');
+  };
+
+  window.srSave = function() {
+    const data=srGetData();
+    if(!data.reportNo){ alert('กรุณากรอก Report No.'); return; }
+    syncPoCostMirror(); syncAfterRepairMirror();
+    const reports=srGetReports();
+    if(srCurrentId) {
+      const idx=reports.findIndex(r=>r.id===srCurrentId);
+      if(idx>=0) reports[idx]={...reports[idx],...data};
+    } else {
+      srCurrentId='sr_'+Date.now();
+      reports.unshift({id:srCurrentId,...data,createdAt:Date.now()});
+    }
+    srSaveReports(reports);
+    srMarkClean();
+    document.getElementById('sr-delete-btn').style.display='';
+    document.getElementById('sr-current-label').textContent=`✅ บันทึกแล้ว — ${data.reportNo}`;
+    if(typeof toast==='function') toast('💾 บันทึก Service Report แล้ว');
+  };
+
+  window.srDelete = function() {
+    if(!srCurrentId) return;
+    if(!confirm('ต้องการลบ Report นี้หรือไม่?')) return;
+    let reports=srGetReports();
+    reports=reports.filter(r=>r.id!==srCurrentId);
+    srSaveReports(reports);
+    srCurrentId=null; srClearForm();
+    document.getElementById('sr-delete-btn').style.display='none';
+    document.getElementById('sr-current-label').textContent='';
+    if(typeof toast==='function') toast('🗑️ ลบแล้ว');
+  };
+
+  // ── List ─────────────────────────────────────
+  window.srShowList = function() {
+    document.getElementById('sr-form-wrap').style.display='none';
+    document.getElementById('sr-list-wrap').style.display='';
+    srRenderList('');
+  };
+  window.srFilterList = function(q) { srRenderList(q); };
+  function srRenderList(q) {
+    const reports=srGetReports();
+    const lq=q.toLowerCase();
+    const filtered=q?reports.filter(r=>
+      (r.reportNo||'').toLowerCase().includes(lq)||
+      (r.company||'').toLowerCase().includes(lq)||
+      (r.model||'').toLowerCase().includes(lq)
+    ):reports;
+    const con=document.getElementById('sr-list-container');
+    if(!con) return;
+    if(!filtered.length){ con.innerHTML='<div class="empty">ไม่พบ Report</div>'; return; }
+    con.innerHTML=filtered.map(r=>`
+      <div class="sr-list-row" onclick="srLoadReport('${r.id}')">
+        <div>
+          <div class="sr-list-info"><span class="mono ta">${r.reportNo||'—'}</span> <span style="margin:0 8px;color:var(--text3)">|</span> <span>${r.company||'—'}</span></div>
+          <div class="sr-list-meta">Model: ${r.model||'—'} | Serial: ${r.serial||'—'} | วันที่: ${r.date||'—'}</div>
+        </div>
+        <div style="display:flex;gap:6px;align-items:center">
+          <span class="badge bb">${(r.parts||[]).filter(p=>p.list).length} อะไหล่</span>
+          <button class="btn btn-ghost btn-sm" onclick="event.stopPropagation();srExportSingleXLSX('${r.id}')">⬇️</button>
+        </div>
+      </div>`).join('');
+  }
+  window.srLoadReport = function(id) {
+    const r=srGetReports().find(rr=>rr.id===id);
+    if(!r) return;
+    srCurrentId=id;
+    srPopulateForm(r);
+    document.getElementById('sr-form-wrap').style.display='';
+    document.getElementById('sr-list-wrap').style.display='none';
+    document.getElementById('sr-delete-btn').style.display='';
+    document.getElementById('sr-current-label').textContent=`📂 ${r.reportNo||id}`;
+    srSwitchTab('report');
+  };
+
+  // ── Export XLSX ──────────────────────────────
+  window.srExportXLSX = function() {
+    const d = srCurrentId ? (srGetReports().find(r=>r.id===srCurrentId)||srGetData()) : srGetData();
+    srBuildXLSX(d);
+  };
+  window.srExportSingleXLSX = function(id) {
+    const r=srGetReports().find(rr=>rr.id===id);
+    if(r) srBuildXLSX(r);
+  };
+
+  function srBuildXLSX(d) {
+    if(typeof XLSX==='undefined') {
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload=()=>srBuildXLSX(d); document.head.appendChild(s); return;
+    }
+    const wb=XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, buildReportSheet(d), 'Report');
+    XLSX.utils.book_append_sheet(wb, buildPoCostSheet(d), 'PO COST');
+    XLSX.utils.book_append_sheet(wb, buildAfterRepairSheet(d), 'After Repair');
+    const fname=`${d.reportNo||'SR'}_${d.company||''}_${d.model||''}_${d.serial||''}.xlsx`.replace(/[/\\?%*:|"<>]/g,'_');
+    XLSX.writeFile(wb, fname);
+    if(typeof toast==='function') toast('⬇️ Export Excel สำเร็จ');
+  }
+
+  const CO = 'OVAL(THAILAND) LTD.  บริษัท โอวัล(ไทยแลนด์) จำกัด\n818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260 Thailand\n818/50 เดอะมาสเตอร์อุดมสุข ถนนอุดมสุข แขวงบางนาเหนือ เขตบางนา กรุงเทพฯ 10260 \nโทร.02-130-7913-4 แฟ็กซ์ 02-130-5615 เลขประจำตัวผู้เสียภาษี 0 1055 49142 05 7 \nEmail : Narathip@ovalthailand.com';
+
+  function baseRows(d, title) {
+    const parts=d.parts||[]; const rows=[];
+    rows.push(['','','','','','','','','','','','','','','','','','','']); // row1
+    rows.push(['','',CO,'','','','','','','','','','','','SERVICE REPORT','','','',title]); // row2-5 company
+    rows.push(['','','','','','','','','','','','','','','Date :','',d.date||'','','']);
+    rows.push(['','','','','','','','','','','','','','','No :','',d.reportNo||'','','']);
+    rows.push(['','','','','','','','','','','','','','','','','','','']);
+    rows.push(['','','CUSTOMER INFORMATION','','','','','','','','','','','','','','','','']); // row6
+    rows.push(['','','COMPANY','','',d.company||'','','','','','','','','MODEL :','',d.model||'','','','']); // row7
+    rows.push(['','','CONTACT PERSON','','',d.contact||'','','','','','','','','SERIAL :','',d.serial||'','','','']); // row8
+    rows.push(['','','DEPARTMENT','','',d.dept||'','','','','','','','','OTHER EQUIPMENT :','',d.eq1qty||'',d.eq1unit||'','','']); // row9
+    rows.push(['','','E-MAIL','','',d.email||'','','','','','','','','','','',d.eq2qty||'',d.eq2unit||'','','']); // row10
+    rows.push(['','','MOBILE','','',d.mobile||'','','','','','','','','','','',d.eq3qty||'',d.eq3unit||'','']); // row11
+    rows.push(['','','','','','','','','','','','','','','','','','','']); // spacer
+    rows.push(['','','PROBLEM INFORMED','','','','','','','','','','','','','','','','']); // row13
+    rows.push(['','',d.prob1||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.prob2||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.prob3||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.prob4||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.prob5||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.prob6||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','','PROBLEMS','','',d.problemEq||'','','','','','','','','','','','','','']);
+    rows.push(['','','INDICATIONS OF EQUIPMENT FAILURE','','','','','',d.failure1||'','','','','','','','','','','']);
+    rows.push(['','',d.failure2||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.failure3||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.failure4||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','','REMEDIES','','','Date : ','',d.remedyDate||'','','','','','','','','','','','']);
+    rows.push(['','','COUNTERMEASURE','','',d.cm1||'','','','','','','','','','','','','','']);
+    rows.push(['','',d.cm2||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.cm3||'','','','','','','','','','','','','','','','','']);
+    rows.push(['','',d.cm4||'','','','','','','','','','','','','','','','','']);
+    return rows;
+  }
+
+  function buildReportSheet(d) {
+    const parts=d.parts||[]; const rows=baseRows(d,'SERVICE REPORT');
+    rows.push(['','','REMEDIAL ACTION','','','','','','','','','','','','RESULTS ','','','','']);
+    rows.push(['','No.','List','','','','Model','','','Q\'ty','','','','','','','','','PASS','','Fail']);
+    for(let i=0;i<(parts.length||10);i++){
+      const p=parts[i]||{};
+      rows.push(['',i+1,p.list||'','','','',p.model||'','','',p.qty||'','','','','','','','',p.result==='PASS'?'✓':'','',p.result==='FAIL'?'✓':'']);
+    }
+    rows.push(['','','','','','','','','','','',d.engineer||'Mr.Thanakorn Kaewsawat','','','','','','','']);
+    rows.push(['','','','','','','','','','','','(Engineer)','','','','','','','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:3},{wch:4},{wch:8},{wch:6},{wch:6},{wch:10},{wch:8},{wch:6},{wch:6},{wch:5},{wch:6},{wch:6},{wch:6},{wch:6},{wch:8},{wch:6},{wch:8},{wch:6},{wch:5}];
+    return ws;
+  }
+
+  function buildPoCostSheet(d) {
+    const parts=d.parts||[]; const pocosts=d.pocosts||[]; const rows=baseRows(d,'SERVICE REPORT');
+    rows.push(['','','REMEDIAL ACTION','','','','','','','','','','','','','','','','']);
+    rows.push(['','No.','List','','','','Model','','','Q\'ty','COST','','','','PO NO.','','','','']);
+    for(let i=0;i<(parts.length||10);i++){
+      const p=parts[i]||{}; const pc=pocosts[i]||{};
+      rows.push(['',i+1,p.list||'','','','',p.model||'','','',p.qty||'',pc.cost||'','','','',pc.po||'','','','']);
+    }
+    rows.push(['','','','','','','','','','','',d.engineer||'Mr.Thanakorn Kaewsawat','','','','','','','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:3},{wch:4},{wch:8},{wch:6},{wch:6},{wch:10},{wch:8},{wch:6},{wch:6},{wch:5},{wch:8},{wch:6},{wch:6},{wch:6},{wch:10},{wch:6},{wch:6},{wch:6},{wch:5}];
+    return ws;
+  }
+
+  function buildAfterRepairSheet(d) {
+    const rows=baseRows(d,'REPAIR REPORT');
+    // Override row 2 date with repair date
+    rows[2][16]=d.repairDate||'';
+    rows.push(['','','FUNCTION INSPECTION','','','','','','','','','','','','','','','','']);
+    const fiRows=[['fi1','fi1r'],['fi2','fi2r'],['fi3','fi3r'],['fi4','fi4r']];
+    fiRows.forEach(([a,b])=>rows.push(['','','',d[a]||'GOOD','','','','','','','','','','',d[b]||'GOOD','','','','']));
+    rows.push(['','','Test Function','','','','','','','','','','','','','','','','']);
+    rows.push(['','','Stability Test','','','','Self check','','','','Calibration result','','','','','','','','']);
+    rows.push(['','','(Stability check not over 0.1 mL/min)','','','','Valve check','','','','Pressure Sensor check','','','','','','','','']);
+    rows.push(['','','No.','Result','','No.','Result','','No.','Result','','No.','Name','Result','','','','','']);
+    (d.stability||DEFAULT_STABILITY).forEach(r=>
+      rows.push(['','',r.no,r.res,'',r.no2,r.res2,'',r.vno,r.vres,'',r.cno,r.cname,r.cres,'','','','',''])
+    );
+    rows.push(['','','','','','','','','','',d.remark||'-','','','','','','','','']);
+    rows.push(['','','Leak Judgement Test','','','','','','','','','','','','','','','','']);
+    rows.push(['','','(Leak check must over 0.1 mL/min Open Valve)','','','','','','','','','','','','','','','','']);
+    rows.push(['','','Work Side (Open)','','','','','','','','Master Side (Open)','','','','','','','','']);
+    rows.push(['','','No.','Result','','','','','','','No.','Result','','','','','','','']);
+    (d.leak||DEFAULT_LEAK).forEach(r=>
+      rows.push(['','',r.wno,r.wres,'','','','','','',r.mno,r.mres,'','','','','','',''])
+    );
+    rows.push(['','','**** = Large leak','','','','','','','','',d.engineer||'Mr.Thanakorn Kaewsawat','','','','','','','']);
+    const ws=XLSX.utils.aoa_to_sheet(rows);
+    ws['!cols']=[{wch:3},{wch:4},{wch:8},{wch:6},{wch:6},{wch:10},{wch:8},{wch:6},{wch:6},{wch:5},{wch:8},{wch:6},{wch:6},{wch:6},{wch:8},{wch:6},{wch:6},{wch:6},{wch:5}];
+    return ws;
+  }
+
+  // ── Import XLSX ───────────────────────────────
+  window.srImportXLSX = function(input) {
+    const file=input.files[0]; if(!file) return;
+    const doImport=()=>{
+      const reader=new FileReader();
+      reader.onload=e=>{
+        try {
+          const wb=XLSX.read(e.target.result,{type:'array'});
+          const sn=wb.SheetNames.includes('Report')?'Report':wb.SheetNames[0];
+          const rows=XLSX.utils.sheet_to_json(wb.Sheets[sn],{header:1,defval:''});
+          const d={parts:[],pocosts:[],stability:[...DEFAULT_STABILITY],leak:[...DEFAULT_LEAK]};
+          const g=(r,c)=>String((rows[r]&&rows[r][c]!==undefined)?rows[r][c]:'').trim();
+          // Parse key fields by scanning
+          rows.forEach((row,ri)=>{
+            const rs=row.map(c=>String(c||'').trim());
+            const rowStr=rs.join('|').toLowerCase();
+            if(rowStr.includes('date :')&&!d.date){const v=rs[16]||rs[6]||'';d.date=parseDate(v);}
+            if(rowStr.includes('no :')&&!d.reportNo){d.reportNo=rs[16]||rs[6]||'';}
+            if(rs[2]==='COMPANY'&&!d.company){d.company=rs[5]||rs[4]||'';}
+            if(rs[2]==='CONTACT PERSON'&&!d.contact){d.contact=rs[5]||'';}
+            if(rs[2]==='DEPARTMENT'&&!d.dept){d.dept=rs[5]||'';}
+            if(rs[2]==='E-MAIL'&&!d.email){d.email=rs[5]||'';}
+            if(rs[2]==='MOBILE'&&!d.mobile){d.mobile=rs[5]||'';}
+            if(rowStr.includes('model :')){const mi=rs.findIndex(c=>c.toLowerCase()==='model :');if(mi>=0)d.model=rs[mi+2]||rs[mi+1]||'';}
+            if(rowStr.includes('serial :')){const si=rs.findIndex(c=>c.toLowerCase()==='serial :');if(si>=0)d.serial=rs[si+2]||rs[si+1]||'';}
+            if(rs[2]==='PROBLEMS'&&!d.problemEq){d.problemEq=rs[5]||'';}
+            if(rs[2]==='INDICATIONS OF EQUIPMENT FAILURE'&&!d.failure1){d.failure1=rs[8]||rs[5]||'';}
+            if(rs[2]==='COUNTERMEASURE'&&!d.cm1){d.cm1=rs[5]||'';}
+            if(rs[2]==='REMEDIES'&&!d.remedyDate){d.remedyDate=parseDate(rs[7]||'');}
+            // Part rows: col 1 is 1-10
+            if(rs[1]&&/^\d+$/.test(rs[1])&&parseInt(rs[1])>=1&&parseInt(rs[1])<=20){
+              const idx=parseInt(rs[1])-1;
+              if(!d.parts[idx]) d.parts[idx]={list:'',model:'',qty:0,po:'',result:''};
+              d.parts[idx].list=rs[2]||'';
+              d.parts[idx].model=rs[6]||'';
+              d.parts[idx].qty=parseFloat(rs[9])||0;
+            }
+          });
+          // PO COST sheet for cost+po
+          if(wb.SheetNames.includes('PO COST')){
+            XLSX.utils.sheet_to_json(wb.Sheets['PO COST'],{header:1,defval:''}).forEach(row=>{
+              const rs=row.map(c=>String(c||'').trim());
+              if(rs[1]&&/^\d+$/.test(rs[1])&&parseInt(rs[1])>=1){
+                const idx=parseInt(rs[1])-1;
+                if(!d.pocosts[idx]) d.pocosts[idx]={cost:0,po:''};
+                d.pocosts[idx].cost=parseFloat(rs[10])||0;
+                d.pocosts[idx].po=rs[14]||'';
+              }
+            });
+          }
+          srCurrentId=null;
+          srPopulateForm(d);
+          document.getElementById('sr-form-wrap').style.display='';
+          document.getElementById('sr-list-wrap').style.display='none';
+          document.getElementById('sr-delete-btn').style.display='none';
+          document.getElementById('sr-current-label').textContent=`📂 Imported: ${d.reportNo||file.name}`;
+          if(typeof toast==='function') toast('📂 Import สำเร็จ');
+        } catch(err){ alert('Import ล้มเหลว: '+err.message); console.error(err); }
+        input.value='';
+      };
+      reader.readAsArrayBuffer(file);
+    };
+    if(typeof XLSX==='undefined'){
+      const s=document.createElement('script');
+      s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.onload=doImport; document.head.appendChild(s);
+    } else doImport();
+  };
+
+  function parseDate(v) {
+    if(!v) return '';
+    if(!isNaN(v)&&parseFloat(v)>40000){ const d=new Date(Math.round((parseFloat(v)-25569)*86400*1000)); return d.toISOString().split('T')[0]; }
+    const d=new Date(v); return isNaN(d)?v:d.toISOString().split('T')[0];
+  }
+
+  function esc(s){ return (s||'').toString().replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+
+  // ── showPage hook ─────────────────────────────
+  const origShowPage=window.showPage;
+  window.showPage=function(id,btn){
+    origShowPage(id,btn);
+    if(id==='servicereport'){
+      if(!document.querySelector('#sr-report-parts-body tr')) srNew();
+      srRefreshDatalist();
+    }
+  };
+
+  // ── Init ──────────────────────────────────────
+  setTimeout(()=>{
+    renderReportParts([]);
+    renderPoCostParts([],[]);
+    renderStability(DEFAULT_STABILITY.map(r=>({...r,res:'',res2:''})));
+    renderLeakRows(DEFAULT_LEAK);
+    const today=new Date().toISOString().split('T')[0];
+    sv('sr-date',today); sv('sr-remedy-date',today); sv('sr-repair-date',today);
+    sv('sr-engineer','Mr.Thanakorn Kaewsawat');
+    srMarkClean();
+  }, 700);
+
+})();
+
+
+try {
+  initFirebase(FIREBASE_CONFIG);
+} catch(e) {
+  console.error('[initFirebase top-level error]', e);
+  // Force show app in local mode
+  window.isFirebase = false;
+  var _app = document.getElementById('app');
+  var _setup = document.getElementById('setup-screen');
+  if (_app) _app.style.display = 'flex';
+  if (_setup) _setup.style.display = 'none';
+  if (typeof loadLocal === 'function') loadLocal();
+  if (typeof initUI === 'function') initUI();
+  var _lbl = document.getElementById('sync-label');
+  if (_lbl) _lbl.textContent = 'Local Mode (Error)';
+}
 </script>
 
 <!-- SCANNER MODAL -->
@@ -3927,5 +5503,24 @@ initFirebase(FIREBASE_CONFIG);
     <div class="scanner-hint">รองรับ Barcode (1D) และ QR Code (2D)<br>ค่าที่ scan ได้จะใส่ในช่องค้นหาอัตโนมัติ</div>
   </div>
 </div>
+
+<script>
+// Update setup status messages at intervals
+setTimeout(function() {
+  var el = document.getElementById('setup-status');
+  var app = document.getElementById('app');
+  if (el && app && app.style.display === 'none') {
+    el.textContent = '⏳ ยังคงรอ Firebase... (จะเปลี่ยนเป็น Local Mode อัตโนมัติถ้าโหลดไม่ได้)';
+  }
+}, 2000);
+setTimeout(function() {
+  var el = document.getElementById('setup-status');
+  var app = document.getElementById('app');
+  if (el && app && app.style.display === 'none') {
+    el.innerHTML = '❌ Firebase โหลดช้า — <b style="color:var(--yellow)">กด "ใช้งานแบบ Local" เพื่อใช้งานทันที</b>';
+  }
+}, 3500);
+</script>
+
 </body>
 </html>
