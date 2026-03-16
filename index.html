@@ -10,6 +10,15 @@
 <link rel="manifest" href="manifest.json">
 <title>FUKUDA Stock</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<!-- Firebase SDK (compat) — loaded as regular scripts for maximum compatibility -->
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+<script>
+// Signal: compat scripts loaded — prevent safety fallback from firing
+window._moduleLoaded = true;
+window._compatSDKLoaded = true;
+</script>
+
 <style>
 :root {
   --bg: #0a0f1e;
@@ -137,8 +146,13 @@ tr:hover td{background:rgba(255,255,255,0.015)}
 .img-prev{width:80px;height:80px;object-fit:cover;border-radius:6px;border:1px solid var(--border)}
 
 /* TOAST */
-#toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%) translateY(80px);background:var(--green);color:#fff;padding:10px 22px;border-radius:30px;font-weight:600;font-size:13px;z-index:2000;transition:transform .3s;pointer-events:none;white-space:nowrap}
-#toast.show{transform:translateX(-50%) translateY(0)}
+#toast-container{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:2000;display:flex;flex-direction:column-reverse;align-items:center;gap:8px;pointer-events:none;min-width:260px;max-width:92vw}
+.toast-item{display:flex;align-items:center;gap:10px;padding:11px 20px 11px 16px;border-radius:30px;font-weight:600;font-size:13px;color:#fff;box-shadow:0 4px 20px rgba(0,0,0,.45);transform:translateY(70px);opacity:0;transition:transform .3s cubic-bezier(.34,1.56,.64,1),opacity .22s;white-space:nowrap;max-width:88vw;overflow:hidden;text-overflow:ellipsis}
+.toast-item.t-show{transform:translateY(0);opacity:1}
+.toast-item.t-hide{transform:translateY(70px) scale(.92);opacity:0;transition:transform .22s ease-in,opacity .18s}
+.t-icon{font-size:16px;flex-shrink:0;line-height:1}
+.t-msg{overflow:hidden;text-overflow:ellipsis}
+#toast{display:none!important}
 
 /* FIREBASE SETUP */
 .setup-screen{position:fixed;inset:0;background:var(--bg);z-index:1000;display:flex;align-items:center;justify-content:center;padding:20px}
@@ -312,12 +326,15 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
 <!-- SAFETY: Auto-fallback if Firebase SDK fails to load -->
 <script>
 (function() {
-  // If app div is still hidden after 4s → Firebase SDK failed → force local mode
+  // If app div is still hidden after 12s → Firebase SDK failed → force local mode
   setTimeout(function() {
     var app = document.getElementById('app');
     var setupScr = document.getElementById('setup-screen');
-    // Skip if module loaded OK (Firebase SDK is just slow - it handles itself)
+    // Skip if: module/compat loaded, Firebase present, or app already visible
     if (window._moduleLoaded) return;
+    if (window._compatSDKLoaded) return;
+    if (window.firebase && window.firebase.firestore) return;
+    if (app && app.style.display !== 'none') return;
     if (app && app.style.display === 'none') {
       console.warn('[Safety] App still hidden after 4s — forcing Local Mode');
       var setupStatus = document.getElementById('setup-status');
@@ -346,7 +363,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
       if (typeof window.updateBadge === 'function') window.updateBadge();
       if (typeof window.initUI === 'function') window.initUI();
     }
-  }, 4000);
+  }, 12000);
 })();
 </script>
 </head>
@@ -380,14 +397,14 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
     </div>
     <div class="fg">
       <label>Firebase Config (JSON)</label>
-      <textarea id="fb-config-input" rows="6" placeholder='{
-  "apiKey": "AIza...",
-  "authDomain": "your-app.firebaseapp.com",
-  "projectId": "your-app",
-  "storageBucket": "your-app.appspot.com",
-  "messagingSenderId": "123456",
-  "appId": "1:123..."
-}'></textarea>
+      <textarea id="fb-config-input" rows="7">{
+  "apiKey": "AIzaSyCNxnBT5MBQdZbJoXwQ98eIMiI7Wmh7ui4",
+  "authDomain": "stock-fukuda-49b0d.firebaseapp.com",
+  "projectId": "stock-fukuda-49b0d",
+  "storageBucket": "stock-fukuda-49b0d.firebasestorage.app",
+  "messagingSenderId": "286338862815",
+  "appId": "1:286338862815:web:cf1b25590427a308a3236a"
+}</textarea>
     </div>
     <button class="btn btn-primary fw" onclick="saveFirebaseConfig()">🚀 เชื่อมต่อ Firebase</button>
     <div style="margin-top:10px;text-align:center">
@@ -729,6 +746,7 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
             <option value="month">30 วันล่าสุด</option>
           </select>
           <button class="btn btn-ghost btn-sm" onclick="exportActivityExcel()">📥 Export Excel</button>
+          <label class="btn btn-ghost btn-sm" style="cursor:pointer">📤 Import ประวัติ<input type="file" accept=".xlsx,.csv" style="display:none" onchange="importHistFile(event)"></label>
           <button class="btn btn-danger btn-sm" onclick="clearActivityLog()">🗑️ ล้าง Log</button>
         </div>
         <!-- Table -->
@@ -1447,7 +1465,10 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
         <div class="card" style="max-width:460px;margin-top:0">
           <div class="card-title">🔥 Firebase</div>
           <div style="font-size:12px;color:var(--text2);margin-bottom:12px" id="fb-status-text">ไม่ได้เชื่อมต่อ</div>
-          <button class="btn btn-ghost btn-sm" onclick="showSetup()">เปลี่ยน Firebase Config</button>
+          <div class="flex gap8" style="flex-wrap:wrap">
+            <button class="btn btn-ghost btn-sm" onclick="showSetup()">🔧 เปลี่ยน Config</button>
+            <button class="btn btn-primary btn-sm" onclick="checkFirebaseConnection()">🔍 ตรวจสอบการเชื่อมต่อ</button>
+          </div>
         </div>
         <div class="card" style="max-width:460px;margin-top:0">
           <div class="card-title">💾 Backup &amp; Restore</div>
@@ -1600,36 +1621,66 @@ tr.drag-over td { border-top:2px solid var(--accent) !important; }
   </div>
 </div>
 
-<div id="toast"></div>
+<div id="toast-container"></div>
+<div id="toast" style="display:none"></div>
 
 <!-- Firebase SDK -->
-<script type="module">
-// Dynamic Firebase import — if fails, app still works in Local Mode
+
+<script>
+// Firebase SDK (compat) loaded via <script> tags in <head>
 let initializeApp, getFirestore, collection, doc, getDocs, addDoc, setDoc, deleteDoc, onSnapshot, query, orderBy;
 let _firebaseLoaded = false;
 
-async function loadFirebaseSDK() {
-  try {
-    const appMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js');
-    const storeMod = await import('https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js');
-    initializeApp = appMod.initializeApp;
-    getFirestore = storeMod.getFirestore;
-    collection = storeMod.collection;
-    doc = storeMod.doc;
-    getDocs = storeMod.getDocs;
-    addDoc = storeMod.addDoc;
-    setDoc = storeMod.setDoc;
-    deleteDoc = storeMod.deleteDoc;
-    onSnapshot = storeMod.onSnapshot;
-    query = storeMod.query;
-    orderBy = storeMod.orderBy;
-    _firebaseLoaded = true;
-    return true;
-  } catch(e) {
-    console.warn('[Firebase SDK] ไม่สามารถโหลด Firebase SDK ได้:', e.message);
-    _firebaseLoaded = false;
-    return false;
-  }
+function loadFirebaseSDK() {
+  return new Promise((resolve) => {
+    const MAX = 80, INTERVAL = 100;
+    let tries = 0;
+    const check = () => {
+      tries++;
+      if (window.firebase && window.firebase.firestore) {
+        _mapFirebaseCompat();
+        _firebaseLoaded = true;
+        resolve(true);
+      } else if (tries >= MAX) {
+        console.warn('[Firebase] SDK not available after timeout');
+        resolve(false);
+      } else {
+        setTimeout(check, INTERVAL);
+      }
+    };
+    check();
+  });
+}
+
+function _mapFirebaseCompat() {
+  const fb = window.firebase;
+  initializeApp = (cfg) => {
+    try { const ex = fb.app(); ex.delete().catch(()=>{}); } catch(e) {}
+    return fb.initializeApp(cfg);
+  };
+  getFirestore = (_app) => fb.firestore();
+  collection = (db, colName) => db.collection(colName);
+  doc        = (db, colName, docId) => db.collection(colName).doc(docId);
+  getDocs    = (ref) => ref.get().then(snap => ({
+    docs: snap.docs
+      ? snap.docs.map(d => ({ id: d.id, data: () => d.data() }))
+      : [{ id: snap.id, data: () => snap.data() }]
+  }));
+  addDoc     = (ref, data) => ref.add(data).then(r => ({ id: r.id }));
+  setDoc     = (ref, data, opts) => ref.set(data, opts && opts.merge ? { merge: true } : {});
+  deleteDoc  = (ref) => ref.delete();
+  onSnapshot = (ref, cb, errCb) => ref.onSnapshot(
+    (snap) => {
+      if (typeof snap.docs !== 'undefined') {
+        cb({ docs: snap.docs.map(d => ({ id: d.id, data: () => d.data() })) });
+      } else {
+        cb({ exists: () => snap.exists, data: () => snap.data(), id: snap.id, docs: undefined });
+      }
+    },
+    errCb || ((e) => console.warn('[onSnapshot]', e))
+  );
+  query   = (ref, ...constraints) => { let q = ref; for (const c of constraints) { if (typeof c === 'function') q = c(q); } return q; };
+  orderBy = (field, dir) => (ref) => ref.orderBy(field, dir || 'asc');
 }
 
 // ============ STATE ======
@@ -1654,7 +1705,7 @@ window.saveFirebaseConfig = function() {
     localStorage.setItem('fb_config', JSON.stringify(cfg));
     initFirebase(cfg);
   } catch(e) {
-    toast('Config ไม่ถูกต้อง กรุณาตรวจสอบ JSON', 'var(--red)');
+    toast('❌ Firebase Config ไม่ถูกต้อง: ' + e.message, 'error');
   }
 }
 
@@ -1666,11 +1717,39 @@ window.useLocalMode = function() {
   document.getElementById('sync-label').textContent = 'Local Mode';
   document.getElementById('sync-dot').style.background = 'var(--yellow)';
   document.getElementById('fb-status-text').textContent = 'ใช้งานแบบ Local (ไม่ sync)';
+  toast('ℹ️ ใช้งานแบบ Local Mode (ไม่ sync กับ Firebase)', 'info');
   initUI();
 }
 
 window.showSetup = function() {
+  // Pre-fill textarea with current config
+  const saved = localStorage.getItem('fb_config');
+  const cfg = saved ? JSON.parse(saved) : (typeof FIREBASE_CONFIG !== 'undefined' ? FIREBASE_CONFIG : null);
+  if (cfg) {
+    const ta = document.getElementById('fb-config-input');
+    if (ta && !ta.value.includes(cfg.projectId)) ta.value = JSON.stringify(cfg, null, 2);
+  }
   document.getElementById('setup-screen').style.display = 'flex';
+}
+
+window.checkFirebaseConnection = async function() {
+  if (!window.isFirebase || !window.db) {
+    toast('⚠️ ขณะนี้ใช้งานแบบ Local Mode — ไม่ได้เชื่อมต่อ Firebase', 'warning');
+    const saved = localStorage.getItem('fb_config');
+    if (saved) {
+      toast('⏳ กำลังลองเชื่อมต่อ Firebase ใหม่...', 'info');
+      try { initFirebase(JSON.parse(saved)); } catch(e) {}
+    }
+    return;
+  }
+  toast('⏳ กำลังตรวจสอบ Firebase...', 'info');
+  try {
+    const snap = await getDocs(query(collection(window.db, 'stocks')));
+    const cfg = JSON.parse(localStorage.getItem('fb_config') || '{}');
+    toast('✅ Firebase ทำงานปกติ — Project: '+(cfg.projectId||'—')+' | stocks: '+snap.docs.length+' รายการใน DB', 'success', 4000);
+  } catch(e) {
+    toast('❌ Firebase ตอบสนองไม่ได้: ' + e.message, 'error', 5000);
+  }
 }
 
 function initFirebase(cfg) {
@@ -1682,9 +1761,10 @@ function initFirebase(cfg) {
       loadLocal();
       document.getElementById('setup-screen').style.display = 'none';
       document.getElementById('app').style.display = 'flex';
-      document.getElementById('sync-label').textContent = 'Local Mode (No Network)';
+      document.getElementById('sync-label').textContent = 'Local Mode';
       document.getElementById('sync-dot').style.background = 'var(--yellow)';
-      document.getElementById('fb-status-text').textContent = 'Firebase SDK โหลดไม่ได้ — ทำงานแบบ Offline';
+      document.getElementById('fb-status-text').textContent = 'ไม่มีอินเทอร์เน็ต — ใช้ข้อมูล Local';
+      toast('⚠️ ไม่สามารถโหลด Firebase SDK — ใช้ Local Mode', 'warning', 5000);
       initUI();
       return;
     }
@@ -1693,40 +1773,45 @@ function initFirebase(cfg) {
 }
 
 function _initFirebaseInner(cfg) {
+  // Show app immediately — don't block UI waiting for Firebase
+  loadLocal();
+  document.getElementById('setup-screen').style.display = 'none';
+  document.getElementById('app').style.display = 'flex';
+  document.getElementById('sync-label').textContent = '⏳ กำลังเชื่อมต่อ...';
+  document.getElementById('sync-dot').style.background = 'var(--yellow)';
+  initUI();
+
+  // Connect Firebase in background
   try {
     const app = initializeApp(cfg);
     window.db = getFirestore(app);
     window.isFirebase = true;
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
-    document.getElementById('sync-label').textContent = 'Firebase Connected';
-    document.getElementById('sync-dot').style.background = 'var(--green)';
-    document.getElementById('fb-status-text').textContent = `เชื่อมต่อกับ Project: ${cfg.projectId}`;
     localStorage.setItem('fb_config', JSON.stringify(cfg));
-    // ถ้า Firebase ไม่ตอบภายใน 8 วินาที → fallback Local
+    // Timeout: if no data in 10s → stay local
     window._fbTimeout = setTimeout(() => {
       if (window.localData.stocks.length === 0 && window.localData.history.length === 0) {
         console.warn('Firebase timeout — switching to Local Mode');
         window.isFirebase = false;
-        document.getElementById('sync-label').textContent = 'Local Mode (Firebase timeout)';
+        document.getElementById('sync-label').textContent = 'Local Mode';
         document.getElementById('sync-dot').style.background = 'var(--yellow)';
         document.getElementById('fb-status-text').textContent = 'Firebase ไม่ตอบสนอง — ใช้ Local Mode';
-        loadLocal();
-        renderStock(); renderDashboard(); renderActivity(); renderCustomers(); renderRestockLog(); updateBadge();
+        toast('⚠️ Firebase timeout — ใช้ข้อมูล Local แทน', 'warning');
       }
-    }, 8000);
+    }, 10000);
     subscribeFirebase();
-    initUI();
+    // subscribeFirebase will call renderStock() etc. when data arrives
+    // Update UI badge when connected
+    document.getElementById('sync-label').textContent = 'Firebase Connected';
+    document.getElementById('sync-dot').style.background = 'var(--green)';
+    document.getElementById('fb-status-text').textContent = 'เชื่อมต่อกับ Project: ' + cfg.projectId;
+    toast('✅ เชื่อมต่อ Firebase สำเร็จ — ' + cfg.projectId, 'info');
   } catch(e) {
     console.error('Firebase init error:', e);
     window.isFirebase = false;
-    loadLocal();
-    document.getElementById('setup-screen').style.display = 'none';
-    document.getElementById('app').style.display = 'flex';
     document.getElementById('sync-label').textContent = 'Local Mode';
     document.getElementById('sync-dot').style.background = 'var(--yellow)';
     document.getElementById('fb-status-text').textContent = 'Firebase เชื่อมไม่ได้ — ใช้ Local Mode';
-    initUI();
+    toast('❌ Firebase เชื่อมต่อไม่ได้ — ใช้ Local Mode', 'error');
   }
 }
 
@@ -1914,7 +1999,7 @@ window.saveDeviceName = function() {
   if (!val) { toast('กรุณาระบุชื่ออุปกรณ์', 'var(--red)'); return; }
   localStorage.setItem('fukuda_device_name', val);
   document.getElementById('device-banner').style.display = 'none';
-  toast('💾 บันทึกชื่ออุปกรณ์แล้ว: ' + val);
+  toast('✅ บันทึกชื่ออุปกรณ์แล้ว: ' + val);
   refreshDeviceUI();
 }
 
@@ -1922,7 +2007,7 @@ window.saveDeviceNameFromSettings = function() {
   const val = document.getElementById('settings-device-name').value.trim();
   if (!val) { toast('กรุณาระบุชื่ออุปกรณ์', 'var(--red)'); return; }
   localStorage.setItem('fukuda_device_name', val);
-  toast('💾 บันทึกชื่ออุปกรณ์แล้ว: ' + val);
+  toast('✅ บันทึกชื่ออุปกรณ์แล้ว: ' + val);
   refreshDeviceUI();
 }
 
@@ -2136,11 +2221,11 @@ window.clearActivityLog = async function() {
   for (const a of logs) { try { await dbDelete('activityLog', a.id); } catch(e){} }
   window.localData.activityLog = [];
   if (!window.isFirebase) renderActivity();
-  toast('🗑️ ล้าง Log แล้ว', 'var(--red)');
+  toast('🗑️ ล้าง Activity Log ทั้งหมดแล้ว', 'var(--red)');
 };
 
 window.exportActivityExcel = function() {
-  loadSheetJS(() => {
+  loadSheetJS(async () => {
     const wb = XLSX.utils.book_new();
     const rows = [['#','วันที่/เวลา','ประเภท','กิจกรรม','Model','รายละเอียด','Device']];
     const all = [
@@ -2171,7 +2256,7 @@ window.exportActivityExcel = function() {
     ws['!cols'] = [{wch:5},{wch:18},{wch:12},{wch:18},{wch:16},{wch:60},{wch:20}];
     XLSX.utils.book_append_sheet(wb, ws, 'Activity Log');
     XLSX.writeFile(wb, 'activity_log_fukuda.xlsx');
-    toast('📥 Export Activity Log แล้ว');
+    toast('✅ Export Activity Log สำเร็จ');
   });
 };
 
@@ -2290,7 +2375,8 @@ function loadSheetJS(cb) {
 
 // EXPORT EXCEL (fully styled)
 window.exportExcel = function(type) {
-  loadSheetJS(() => {
+  toast('⏳ กำลังสร้าง Excel...', 'info');
+  loadSheetJS(async () => {
     const wb = XLSX.utils.book_new();
     const today = new Date().toLocaleDateString('th-TH');
 
@@ -2490,7 +2576,7 @@ window.exportExcel = function(type) {
       ];
 
       // Freeze header
-      ws['!freeze'] = {xSplit:0, ySplit:4, topLeftCell:'A5', activePane:'bottomLeft'};
+      ws['!views'] = [{state:'frozen', xSplit:0, ySplit:4, topLeftCell:'A5', activePane:'bottomLeft'}];
 
       // Title row
       if (!ws['A1']) ws['A1']={v:'',t:'s'};
@@ -2631,7 +2717,7 @@ window.exportExcel = function(type) {
       rowH.push({hpt:26});
       ws['!rows'] = rowH;
       ws['!cols'] = [{wch:5},{wch:12},{wch:16},{wch:14},{wch:28},{wch:14},{wch:30},{wch:14},{wch:9},{wch:16},{wch:16},{wch:16},{wch:22}];
-      ws['!freeze'] = {xSplit:0, ySplit:4, topLeftCell:'A5', activePane:'bottomLeft'};
+      ws['!views'] = [{state:'frozen', xSplit:0, ySplit:4, topLeftCell:'A5', activePane:'bottomLeft'}];
 
       // Title
       if (!ws['A1']) ws['A1']={v:'',t:'s'};
@@ -2766,12 +2852,14 @@ window.exportExcel = function(type) {
     }
 
     XLSX.writeFile(wb, filename);
-    toast('📥 Export Excel แล้ว');
+    await logActivity({ action:'Export Excel', model:'', detail:'ไฟล์: '+filename+' | ประเภท: '+type });
+    toast('✅ Export Excel สำเร็จ — '+filename);
   });
 }
 
 // EXPORT PDF
 window.exportPDF = function(type) {
+  toast('⏳ กำลังสร้าง PDF...', 'info');
   function loadJsPDF(cb) {
     if (window.jspdf) { cb(); return; }
     const s = document.createElement('script');
@@ -3027,7 +3115,7 @@ window.exportPDF = function(type) {
       addPageNumbers();
       doc.save(`FUKUDA_History_${today}.pdf`);
     }
-    toast('📄 Export PDF แล้ว');
+    toast('✅ Export PDF สำเร็จ — '+filename);
   });
 }
 
@@ -3121,10 +3209,11 @@ window.importStockFile = async function(e) {
       }
     }
     if (!window.isFirebase) { renderStock(); renderDashboard(); updateModelDL(); updateBadge(); }
-    toast(`✅ Import แล้ว: เพิ่ม ${added} / อัพเดต ${updated} รายการ`);
+    await logActivity({ action:'Import Stock', model:'', detail:'ไฟล์: '+file.name+' | เพิ่ม: '+added+' | อัพเดต: '+updated });
+    toast('✅ Import Stock สำเร็จ — เพิ่ม '+added+' รายการ, อัพเดต '+updated+' รายการ');
   } catch(err) {
     console.error('importStockFile error:', err);
-    toast('❌ ไฟล์ผิดรูปแบบ หรือเกิดข้อผิดพลาด: ' + err.message, 'var(--red)');
+    toast('❌ Import ล้มเหลว: ' + err.message, 'var(--red)');
   }});
 }
 
@@ -3391,7 +3480,8 @@ window.saveStock = async function() {
     await dbAdd('stocks', { ...data, createdAt: Date.now() });
     await logActivity({ action:'เพิ่มสินค้า', model:data.model, detail:`PO: ${data.po} | qty: ${data.qty}` });
   }
-  closeModal('modal-stock'); toast(id?'แก้ไขสินค้าแล้ว':'เพิ่มสินค้าแล้ว');
+  closeModal('modal-stock');
+  toast(id ? '✅ แก้ไขสินค้าแล้ว — '+data.model : '✅ เพิ่มสินค้าใหม่แล้ว — '+data.model);
   if (!window.isFirebase) { renderStock(); renderDashboard(); updateModelDL(); updateBadge(); }
 }
 
@@ -3399,7 +3489,8 @@ window.deleteStock = async function(id) {
   if (!confirm('ลบสินค้านี้?')) return;
   const s = window.localData.stocks.find(x=>x.id===id);
   await logActivity({ action:'ลบสินค้า', model:s?.model||id, detail:`PO: ${s?.po||'—'} | qty: ${s?.qty||0}` });
-  await dbDelete('stocks', id); toast('ลบแล้ว','var(--red)');
+  await dbDelete('stocks', id);
+  toast('🗑️ ลบสินค้าแล้ว — '+(s&&s.model||id), 'var(--red)');
   if (!window.isFirebase) { renderStock(); renderDashboard(); updateBadge(); renderActivity(); }
 }
 
@@ -3606,7 +3697,7 @@ window.clearRestockCart = function() {
 }
 
 window.saveRestockCart = async function() {
-  if (!window.restockCart.length) { toast('ไม่มีรายการ', 'var(--red)'); return; }
+  if (!window.restockCart.length) { toast('❌ ยังไม่มีรายการในตะกร้าเติมสินค้า', 'var(--red)'); return; }
   let saved = 0;
   for (const item of window.restockCart) {
     const existing = window.localData.stocks.find(s => s.model === item.model && s.po === item.po);
@@ -3630,7 +3721,7 @@ window.saveRestockCart = async function() {
   window.restockCart = [];
   renderRestockCart();
   clearRestockForm();
-  toast('✅ บันทึกทั้งหมด ' + saved + ' รายการ');
+  toast('✅ บันทึกการเติมสินค้าแล้ว — '+saved+' รายการ');
   if (!window.isFirebase) { renderStock(); renderDashboard(); renderRestockLog(); updateModelDL(); updateBadge(); renderActivity(); }
 }
 
@@ -3854,9 +3945,9 @@ window.updateWdTotals = function() {
 }
 
 window.confirmWithdraw = async function() {
-  if (!window.wdCart.length) { toast('ไม่มีรายการ','var(--red)'); return; }
+  if (!window.wdCart.length) { toast('❌ ยังไม่มีรายการในตะกร้า กรุณาเพิ่มสินค้าก่อน','var(--red)'); return; }
   const name = document.getElementById('wd-name').value;
-  if (!name) { toast('❌ กรุณาเลือกผู้เบิก', 'var(--red)'); return; }
+  if (!name) { toast('❌ กรุณาระบุชื่อผู้เบิกสินค้า', 'var(--red)'); return; }
   // ตรวจสอบ qty เกิน stock
   const overItems = window.wdCart.filter(item => item.stockId && item.qty > (item.stockQty||0));
   if (overItems.length) {
@@ -3881,7 +3972,7 @@ window.confirmWithdraw = async function() {
   const savedCount = window.wdCart.length;
   await logActivity({ action:'เบิกสินค้า', model: window.wdCart.map(i=>i.model).join(', '), detail:`Job: ${job||'—'} | ลูกค้า: ${customer||'—'} | ผู้เบิก: ${name} | ${savedCount} รายการ` });
   window.wdCart=[]; clearWithdraw();
-  toast('✅ บันทึกการเบิก ' + savedCount + ' รายการ');
+  toast('✅ บันทึกการเบิกแล้ว — '+savedCount+' รายการ | ผู้เบิก: '+name);
   if (!window.isFirebase) { renderStock(); renderDashboard(); updateBadge(); renderWdHistory(); }
 }
 
@@ -4035,7 +4126,7 @@ window.saveHist = async function() {
   }
   await dbSet('history',id,data);
   await logActivity({ action:'แก้ไขประวัติเบิก', model:h?.model||'', detail:diffDetail });
-  closeModal('modal-hist'); toast('✅ แก้ไขแล้ว — Stock ปรับตามอัตโนมัติ');
+  closeModal('modal-hist'); toast('✅ แก้ไขประวัติเบิกแล้ว — '+diffDetail);
   if (!window.isFirebase) { renderActivity(); renderWdHistory(); renderStock(); renderDashboard(); updateBadge(); }
 }
 
@@ -4054,7 +4145,7 @@ window.deleteHist = async function() {
   }
   await dbDelete('history', id);
   await logActivity({ action:'ลบประวัติเบิก', model:h?.model||'', detail:`Job: ${h?.job||'—'} | ผู้เบิก: ${h?.name||'—'} | วันที่: ${h?.dateDisplay||h?.date||'—'} | จำนวน: ${h?.qty||1} (คืน stock แล้ว)` });
-  closeModal('modal-hist'); toast('ลบแล้ว — คืน stock แล้ว', 'var(--red)');
+  closeModal('modal-hist'); toast('🗑️ ลบประวัติเบิกแล้ว — คืน stock '+(h&&h.qty||1)+' ชิ้น', 'var(--red)');
   if (!window.isFirebase) { renderActivity(); renderWdHistory(); renderStock(); renderDashboard(); updateBadge(); }
 }
 
@@ -4106,14 +4197,25 @@ window.saveCust = async function() {
   if(!name){toast('❌ กรุณากรอก: ชื่อบริษัท / ลูกค้า','var(--red)');return;}
   const data={name,dept:document.getElementById('mc-dept').value.trim(),addr:document.getElementById('mc-addr').value,contact:document.getElementById('mc-contact').value,tel:document.getElementById('mc-tel').value,email:document.getElementById('mc-email').value};
   const id=document.getElementById('mc-id').value;
-  if(id) await dbSet('customers',id,data); else await dbAdd('customers',data);
-  closeModal('modal-cust'); toast(id?'แก้ไขลูกค้าแล้ว':'เพิ่มลูกค้าแล้ว');
+  if(id) {
+    await dbSet('customers',id,data);
+    await logActivity({ action:'แก้ไขลูกค้า', model:'', detail:'ชื่อ: '+name+' | แผนก: '+(data.dept||'—')+' | ผู้ติดต่อ: '+(data.contact||'—') });
+    toast('✅ แก้ไขลูกค้าแล้ว');
+  } else {
+    await dbAdd('customers',data);
+    await logActivity({ action:'เพิ่มลูกค้า', model:'', detail:'ชื่อ: '+name+' | แผนก: '+(data.dept||'—')+' | ผู้ติดต่อ: '+(data.contact||'—') });
+    toast('✅ เพิ่มลูกค้าแล้ว');
+  }
+  closeModal('modal-cust');
   if(!window.isFirebase){renderCustomers();updateCustDL();}
 }
 
 window.deleteCust = async function(id) {
-  if(!confirm('ลบลูกค้านี้?'))return;
-  await dbDelete('customers',id); toast('ลบแล้ว','var(--red)');
+  const c = window.localData.customers.find(x=>x.id===id);
+  if(!confirm('ลบลูกค้า "'+(c&&c.name||id)+'" ?\n\nการกระทำนี้ไม่สามารถย้อนกลับได้'))return;
+  await dbDelete('customers',id);
+  await logActivity({ action:'ลบลูกค้า', model:'', detail:'ชื่อ: '+(c&&c.name||id) });
+  toast('🗑️ ลบลูกค้าแล้ว','var(--red)');
   if(!window.isFirebase){renderCustomers();updateCustDL();}
 }
 
@@ -4136,9 +4238,13 @@ window.saveSettings = async function() {
     margin:parseFloat(document.getElementById('cfg-margin').value)||45,
     email:document.getElementById('cfg-email').value
   };
+  if(s.rate<=0||s.rate>10){toast('❌ อัตราแลกเปลี่ยน JPY ไม่ถูกต้อง (ควรอยู่ที่ 0.2–0.35)','var(--red)');return;}
+  if(s.margin<=0||s.margin>=100){toast('❌ Margin ต้องอยู่ระหว่าง 1–99%','var(--red)');return;}
   window.localData.settings=s;
   await dbSaveSettings(s);
-  document.getElementById('rs-mg').textContent=s.margin;
+  const mgEl=document.getElementById('rs-mg'); if(mgEl) mgEl.textContent=s.margin;
+  toast('✅ บันทึกการตั้งค่าแล้ว — Rate: ¥1=฿'+s.rate+' | Tax: '+s.tax+'% | Fwd: '+s.fwd+'% | Margin: '+s.margin+'%');
+  await logActivity({ action:'แก้ไขตั้งค่า', model:'', detail:'Rate:'+s.rate+' | Tax:'+s.tax+'% | Fwd:'+s.fwd+'% | Margin:'+s.margin+'%' });
 }
 
 // ============ DATALISTS ============
@@ -4202,11 +4308,48 @@ window.toggleSidebar = function() {
   document.querySelector('.toggle-btn').textContent = s.classList.contains('expanded') ? '⟨' : '⟩';
 }
 
-let toastTimer;
-window.toast = function(msg, color='var(--green)') {
-  const t=document.getElementById('toast');
-  t.textContent=msg; t.style.background=color; t.classList.add('show');
-  clearTimeout(toastTimer); toastTimer=setTimeout(()=>t.classList.remove('show'),2500);
+// ── Toast notification system ──────────────────────────
+function _toastColor(type) {
+  if(type==='error')   return '#dc2626';
+  if(type==='warning') return '#d97706';
+  if(type==='info')    return '#2563eb';
+  return '#059669';
+}
+function _toastIcon(type) {
+  if(type==='error')   return '❌';
+  if(type==='warning') return '⚠️';
+  if(type==='info')    return 'ℹ️';
+  return '✅';
+}
+function _inferType(msg, color) {
+  if(color && color !== 'var(--green)' && color !== '#059669') {
+    if(color.includes('red') || color.includes('#dc') || color.includes('#ef')) return 'error';
+    if(color.includes('yellow') || color.includes('#d9') || color.includes('#f5')) return 'warning';
+    if(color.includes('blue') || color.includes('#23') || color.includes('accent')) return 'info';
+  }
+  const m = (msg||'').toLowerCase();
+  if(m.startsWith('❌') || m.includes('ล้มเหลว') || m.includes('ผิดพลาด') || m.includes('error') || m.includes('ไม่ถูกต้อง') || m.includes('ไม่พบ') || m.includes('กรุณา') || m.includes('เกิน')) return 'error';
+  if(m.startsWith('⚠️') || m.includes('เตือน') || m.includes('timeout')) return 'warning';
+  if(m.startsWith('⏳') || m.startsWith('ℹ️') || m.includes('กำลัง') || m.includes('local mode')) return 'info';
+  return 'success';
+}
+window.toast = function(msg, colorOrType, duration) {
+  const type = _inferType(msg, colorOrType||'');
+  const ms = duration || (type==='error' ? 3500 : type==='warning' ? 3000 : 2500);
+  const color = _toastColor(type);
+  const icon  = _toastIcon(type);
+  const container = document.getElementById('toast-container');
+  if(!container) return;
+  const el = document.createElement('div');
+  el.className = 'toast-item';
+  el.style.background = color;
+  el.innerHTML = '<span class="t-icon">'+icon+'</span><span class="t-msg">'+msg+'</span>';
+  container.appendChild(el);
+  requestAnimationFrame(()=>{ requestAnimationFrame(()=>{ el.classList.add('t-show'); }); });
+  setTimeout(()=>{
+    el.classList.remove('t-show'); el.classList.add('t-hide');
+    setTimeout(()=>{ if(el.parentNode) el.parentNode.removeChild(el); }, 250);
+  }, ms);
 }
 
 // ============ AUTO-INIT ============
@@ -4296,15 +4439,16 @@ window.importHistFile = async function(e) {
       added++;
     }
     if (!window.isFirebase) renderActivity();
-    toast(`✅ Import ประวัติแล้ว ${added} รายการ`);
+    await logActivity({ action:'Import ประวัติเบิก', model:'', detail:'ไฟล์: '+file.name+' | เพิ่ม: '+added });
+    toast('✅ Import ประวัติเบิกสำเร็จ — เพิ่ม '+added+' รายการ');
   } catch(err) {
     console.error('importHistFile error:', err);
-    toast('❌ ไฟล์ผิดรูปแบบ หรือเกิดข้อผิดพลาด: ' + err.message, 'var(--red)');
+    toast('❌ Import ล้มเหลว: ' + err.message, 'var(--red)');
   }});
 }
 
 // ============ BACKUP & RESTORE ============
-window.backupData = function() {
+window.backupData = async function() {
   const now = new Date();
   const pad = n => String(n).padStart(2,'0');
   const dateStr = `${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}_${pad(now.getHours())}${pad(now.getMinutes())}`;
@@ -4333,7 +4477,8 @@ window.backupData = function() {
   // บันทึกเวลา backup ล่าสุด
   localStorage.setItem('fukuda_last_backup', now.toISOString());
   updateBackupLabel();
-  toast(`✅ Backup แล้ว — ${backup.stocks.length} Stock, ${backup.history.length} ประวัติ, ${backup.customers.length} ลูกค้า`);
+  await logActivity({ action:'Backup ข้อมูล', model:'', detail:'Stock:'+backup.stocks.length+' | ประวัติ:'+backup.history.length+' | ลูกค้า:'+backup.customers.length });
+  toast('✅ Backup สำเร็จ — Stock '+backup.stocks.length+', ประวัติ '+backup.history.length+', ลูกค้า '+backup.customers.length+' รายการ');
 };
 
 window.restoreData = async function(e) {
@@ -4363,7 +4508,7 @@ window.restoreData = async function(e) {
       );
       if (!confirmed) return;
 
-      toast('⏳ กำลัง Restore ขึ้น Firebase...', 'var(--yellow)');
+      toast('⏳ กำลัง Restore ขึ้น Firebase... อาจใช้เวลาสักครู่', 'warning');
       let added = 0;
 
       for (const s of data.stocks) {
@@ -4428,7 +4573,7 @@ function updateBackupLabel() {
 
 // ============ CUSTOMERS IMPORT / EXPORT ============
 window.exportCustExcel = function() {
-  loadSheetJS(() => {
+  loadSheetJS(async () => {
     const wb = XLSX.utils.book_new();
     const headers = ['#','ชื่อบริษัท / ลูกค้า','แผนก','ที่อยู่','ผู้ติดต่อ','โทรศัพท์','อีเมล'];
     const rows = [headers];
@@ -4447,13 +4592,13 @@ window.exportCustExcel = function() {
     const ws = XLSX.utils.aoa_to_sheet(rows);
     ws['!cols'] = [{wch:5},{wch:40},{wch:20},{wch:30},{wch:20},{wch:15},{wch:25}];
     // freeze header row
-    ws['!freeze'] = { xSplit:0, ySplit:1, topLeftCell:'A2', activePane:'bottomLeft' };
+    ws['!views'] = [{state:'frozen',  xSplit:0, ySplit:1, topLeftCell:'A2', activePane:'bottomLeft' }];
     XLSX.utils.book_append_sheet(wb, ws, 'Customers');
     const today = new Date();
     const pad = n => String(n).padStart(2,'0');
     const dateStr = `${today.getFullYear()}${pad(today.getMonth()+1)}${pad(today.getDate())}`;
     XLSX.writeFile(wb, `customers_fukuda_${dateStr}.xlsx`);
-    toast(`📥 Export ลูกค้า ${custs.length} รายการแล้ว`);
+    toast('✅ Export ลูกค้าสำเร็จ — '+custs.length+' รายการ');
   });
 };
 
@@ -4523,7 +4668,7 @@ window.importCustFile = async function(e) {
 
     if (!window.isFirebase) { renderCustomers(); updateCustDL(); }
     await logActivity({ action:'Import ลูกค้า', model:'', detail:`เพิ่ม ${added} / อัพเดต ${updated} รายการ จากไฟล์: ${file.name}` });
-    toast(`✅ Import ลูกค้าแล้ว: เพิ่ม ${added} / อัพเดต ${updated} รายการ`);
+    toast('✅ Import ลูกค้าสำเร็จ — เพิ่ม '+added+' รายการ, อัพเดต '+updated+' รายการ');
   } catch(err) {
     console.error('importCustFile error:', err);
     toast('❌ ไฟล์ผิดรูปแบบ: ' + err.message, 'var(--red)');
@@ -5265,9 +5410,10 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScanner
   };
 
   function srBuildXLSX(d) {
+    if(typeof loadSheetJS==='function'&&typeof XLSX==='undefined'){ loadSheetJS(()=>srBuildXLSX(d)); return; }
     if(typeof XLSX==='undefined') {
       const s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
       s.onload=()=>srBuildXLSX(d); document.head.appendChild(s); return;
     }
     const wb=XLSX.utils.book_new();
@@ -5276,7 +5422,7 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScanner
     XLSX.utils.book_append_sheet(wb, buildAfterRepairSheet(d), 'After Repair');
     const fname=`${d.reportNo||'SR'}_${d.company||''}_${d.model||''}_${d.serial||''}.xlsx`.replace(/[/\\?%*:|"<>]/g,'_');
     XLSX.writeFile(wb, fname);
-    if(typeof toast==='function') toast('⬇️ Export Excel สำเร็จ');
+    if(typeof toast==='function') toast('✅ Export Service Report สำเร็จ — '+fname);
   }
 
   const CO = 'OVAL(THAILAND) LTD.  บริษัท โอวัล(ไทยแลนด์) จำกัด\n818/50 The Master Udomsuk, Udomsuk Rd., Bangna-Nua, Bangna, Bangkok 10260 Thailand\n818/50 เดอะมาสเตอร์อุดมสุข ถนนอุดมสุข แขวงบางนาเหนือ เขตบางนา กรุงเทพฯ 10260 \nโทร.02-130-7913-4 แฟ็กซ์ 02-130-5615 เลขประจำตัวผู้เสียภาษี 0 1055 49142 05 7 \nEmail : Narathip@ovalthailand.com';
@@ -5428,15 +5574,16 @@ document.addEventListener('keydown', e => { if (e.key === 'Escape') closeScanner
           document.getElementById('sr-list-wrap').style.display='none';
           document.getElementById('sr-delete-btn').style.display='none';
           document.getElementById('sr-current-label').textContent=`📂 Imported: ${d.reportNo||file.name}`;
-          if(typeof toast==='function') toast('📂 Import สำเร็จ');
+          if(typeof toast==='function') toast('✅ Import Service Report สำเร็จ — '+(d.reportNo||file.name));
         } catch(err){ alert('Import ล้มเหลว: '+err.message); console.error(err); }
         input.value='';
       };
       reader.readAsArrayBuffer(file);
     };
-    if(typeof XLSX==='undefined'){
+    if(typeof loadSheetJS==='function'){ loadSheetJS(doImport); }
+    else if(typeof XLSX==='undefined'){
       const s=document.createElement('script');
-      s.src='https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+      s.src='https://cdn.jsdelivr.net/npm/xlsx-js-style@1.2.0/dist/xlsx.bundle.js';
       s.onload=doImport; document.head.appendChild(s);
     } else doImport();
   };
@@ -5510,16 +5657,9 @@ setTimeout(function() {
   var el = document.getElementById('setup-status');
   var app = document.getElementById('app');
   if (el && app && app.style.display === 'none') {
-    el.textContent = '⏳ ยังคงรอ Firebase... (จะเปลี่ยนเป็น Local Mode อัตโนมัติถ้าโหลดไม่ได้)';
+    el.textContent = '⏳ ยังคงรอ Firebase... (จะเปลี่ยนเป็น Local Mode อัตโนมัติ)';
   }
-}, 2000);
-setTimeout(function() {
-  var el = document.getElementById('setup-status');
-  var app = document.getElementById('app');
-  if (el && app && app.style.display === 'none') {
-    el.innerHTML = '❌ Firebase โหลดช้า — <b style="color:var(--yellow)">กด "ใช้งานแบบ Local" เพื่อใช้งานทันที</b>';
-  }
-}, 3500);
+}, 3000);
 </script>
 
 </body>
